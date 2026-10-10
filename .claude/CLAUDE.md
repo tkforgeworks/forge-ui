@@ -27,7 +27,8 @@ Flutter package (Material 3), Flutter `3.47.5` pinned in `.github/workflows/ci.y
 
 - Branching (org standard, `tkforgeworks/.github/docs/branching-and-release.md`):
   `main` is the released state; work accumulates on the current release branch
-  `vX.Y.Z/main` (currently `v0.0.1/main`, the repo-setup batch); topic branches
+  `vX.Y.Z/main` (currently `v0.1.0/main`; `v0.0.1/main` was the repo-setup
+  batch and is merged); topic branches
   PR **into the release branch**, never into `main`; the release branch reaches
   `main` via a release PR.
 - `main` is protected by the org repository ruleset: PR-only, no force-push or
@@ -71,5 +72,69 @@ Flutter package (Material 3), Flutter `3.47.5` pinned in `.github/workflows/ci.y
 
 ## Current status
 
-Repo setup to org standards (`v0.0.1/main`). Next: close the open gaps in the
-spec, then start `v0.1.0/main`. Open items: Jira project, release pipeline.
+As of 2026-10-10: repo setup to org standards is done and on `main` (PRs #1
+and #2, checked against `tkforgeworks/.github` @ `be3ad49`). Both rulesets are
+live: `main` (id 24830672, required check `ci / ci`) and `release-branches`
+(id 24830561). No tag or release exists. The package is an empty skeleton with
+one placeholder test. No implementation starts until the spec pass below is
+done.
+
+## Next actions
+
+`v0.1.0/main` is cut and `pubspec.yaml` is at `0.1.0+1`. `main` is PR-only, so
+every change, including edits to this file and the spec, goes through a topic
+branch and a PR into `v0.1.0/main`.
+
+1. Spec pass: walk the "Spec gaps" list below with Tim, get a decision on each,
+   and write the decisions into
+   `docs/forge-ui_forge-core_Shared_Flutter_Packages_Spec.md`.
+2. Only after the spec is settled: finish spec milestone 1 (empty showcase app
+   under `example/`), then start forge-ui v0.1 (milestone 2).
+
+## Open items
+
+### Spec gaps (need a decision from Tim unless marked settled)
+
+- **Fonts are not named.** The spec says fixed, bundled and OFL-only but picks
+  no typefaces; this blocks `ForgeType`. Candidates: Poppins, JetBrains Mono
+  and Source Serif 4, which the org's parked brand doc
+  (`tkforgeworks/.github/docs/future-brand-and-plugins.md`) lists as the
+  existing brand fonts. Tim has not confirmed them. That doc says the files
+  live in a `tkforgeworks-design` skill folder, which is not on this machine.
+  Check each font's `OFL.txt` when bundling.
+- **Timing of the shared screens.** Sign-in, account settings and about are in
+  the v1 widget set, but milestone 2 (v0.1) only says "base components".
+  Decide whether they ship in v0.1 or alongside forge-core v0.1 / v0.2.
+- **Apple button on Android.** Apple sign-in there is deferred, so the sign-in
+  screen must be able to hide a provider (for example a null callback).
+- **Account settings data shape.** `forge_ui` cannot import `forge_core`, so
+  the "linked sign-in methods" list needs its own plain data type in
+  `forge_ui`. Not specified.
+- **Icon style** is listed as fixed by the brand but not defined.
+- **"At most one signature component" per app** is not defined.
+- **Package-layering diagram** is missing; the markdown export left only an
+  `[embedded content]` placeholder.
+- **Settled, write into the spec:** the license is Apache-2.0 per the org
+  standard, and the line asking for a license field in `pubspec.yaml` should
+  be dropped because Dart has none.
+- **Not blocking:** seed color for each existing app (the spec's own open
+  item; the showcase uses sample seeds).
+
+### Repo and process
+
+- **Jira project.** None exists for forge-ui. Until Tim creates one, follow
+  the no-key convention above. When it exists, switch branch names and
+  subjects to the keyed form and remove the deviation from
+  `.github/org-standards.yml`.
+- **Release pipeline.** Deferred until v0.1 is close. Before adopting, note:
+  `release-flutter.yml` with `build-windows` and `build-android` both false
+  looks like a fit for tagging a package but no repo has run it that way; it
+  needs a `JIRA_BASE_URL` variable and a `ticket-prefix`; the bump scripts get
+  vendored into `scripts/release/`; and once `release.yml` exists, any merge
+  to `main` whose `pubspec.yaml` version has no tag publishes a stable
+  release.
+- **`v0.0.1/main` still exists.** It is fully merged, has no tag, and the
+  `release-branches` ruleset blocks deleting it. Removing it means disabling
+  that ruleset briefly, which needs Tim's explicit yes.
+- **Placeholder test.** Replace `test/forge_ui_test.dart` when the first
+  component lands.
