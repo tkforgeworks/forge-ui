@@ -124,11 +124,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
         onPressed: () => _say('The one gradient button.'),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          16,
-          8,
-          16,
-          96,
+        padding: const EdgeInsets.only(
+          top: 8,
+          bottom: 96,
         ).withNavBarInset(context),
         children: [
           _Section(
@@ -333,6 +331,21 @@ class _GalleryScreenState extends State<GalleryScreen> {
               ],
             ),
           ),
+          _Section(
+            'Main action',
+            // Room underneath for the forge shadow.
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: ForgeFab(
+                  heroTag: 'gallery-inline-fab',
+                  label: 'New entry',
+                  onPressed: () => _say('The one gradient button.'),
+                ),
+              ),
+            ),
+          ),
           const _Section(
             'Capsules',
             child: Wrap(
@@ -465,7 +478,30 @@ class _GalleryScreenState extends State<GalleryScreen> {
   }
 }
 
-/// A gallery block: mono heading, then the component.
+/// The gallery's sections, top to bottom. The golden tests photograph each
+/// one for the README, so a section added here needs a heading there.
+const gallerySections = [
+  'Palette',
+  'Brand',
+  'Type',
+  'Buttons',
+  'Fields',
+  'Selection',
+  'Main action',
+  'Capsules',
+  'Settings group',
+  'Empty state',
+  'Error',
+  'Loading',
+  'Confirm sheet',
+  'Screens',
+];
+
+/// The key on a section's repaint boundary, for tests that photograph it.
+Key gallerySectionKey(String title) => ValueKey('gallery-section-$title');
+
+/// A gallery block: mono heading, then the component. Each block paints its
+/// own background inside a repaint boundary, so it can be captured alone.
 class _Section extends StatelessWidget {
   const _Section(this.title, {required this.child});
 
@@ -473,15 +509,21 @@ class _Section extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 22),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        ForgeMonoLabel(title, emphasis: true),
-        const SizedBox(height: 10),
-        child,
-      ],
+  Widget build(BuildContext context) => RepaintBoundary(
+    key: gallerySectionKey(title),
+    child: ColoredBox(
+      color: context.colors.surface,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ForgeMonoLabel(title, emphasis: true),
+            const SizedBox(height: 10),
+            child,
+          ],
+        ),
+      ),
     ),
   );
 }

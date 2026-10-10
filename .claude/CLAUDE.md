@@ -34,6 +34,9 @@ under `lib/src/` (`theme/`, `widgets/`, `screens/`). Fonts and their OFL texts
 are in `assets/fonts/`. `example/` is the showcase app; its tests are golden
 images under `example/test/goldens/` and run as the `showcase / ci` job. Read
 the golden PNGs to see the current look without running anything.
+`example/README.md` is the component catalogue: it embeds those same PNGs
+beside a code example for each component, so a new or changed component
+means updating the gallery section, its golden and that README together.
 
 ## Repo & process conventions (org standard)
 

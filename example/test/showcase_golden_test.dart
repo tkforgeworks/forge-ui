@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forge_ui/forge_ui.dart';
+import 'package:forge_ui_showcase/gallery.dart';
 import 'package:forge_ui_showcase/samples.dart';
 import 'package:forge_ui_showcase/showcase_app.dart';
 
@@ -11,7 +13,7 @@ import 'package:forge_ui_showcase/showcase_app.dart';
 /// `flutter test --update-goldens` and look at the images before committing.
 void main() {
   // A phone-width page tall enough to hold the whole gallery.
-  const gallerySize = Size(412, 3080);
+  const gallerySize = Size(412, 3220);
   const screenSize = Size(412, 900);
 
   String slug(String name) =>
@@ -27,6 +29,20 @@ void main() {
     }
   }
 
+  /// flutter_test paints every shadow as a solid block unless told otherwise,
+  /// which would misdraw the forge shadow under `ForgeFab`. The flag has to
+  /// be back to true before the test body returns.
+  void goldenTest(String name, Future<void> Function(WidgetTester) body) {
+    testWidgets(name, (tester) async {
+      debugDisableShadows = false;
+      try {
+        await body(tester);
+      } finally {
+        debugDisableShadows = true;
+      }
+    });
+  }
+
   void useSurface(WidgetTester tester, Size size) {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -35,7 +51,7 @@ void main() {
 
   for (final (index, sample) in samples.indexed) {
     for (final mode in [ThemeMode.light, ThemeMode.dark]) {
-      testWidgets('gallery: ${sample.name}, ${mode.name}', (tester) async {
+      goldenTest('gallery: ${sample.name}, ${mode.name}', (tester) async {
         useSurface(tester, gallerySize);
         await tester.pumpWidget(
           ShowcaseApp(initialSample: index, initialMode: mode),
@@ -47,6 +63,40 @@ void main() {
             'goldens/gallery_${slug(sample.name)}_${mode.name}.png',
           ),
         );
+        await tester.pumpWidget(const SizedBox.shrink());
+      });
+    }
+  }
+
+  // Images for the README, at 2x: every gallery section in the first sample
+  // (Violet, the plain seed-only case most apps will look like), and the
+  // palette and buttons sections in each of the others.
+  for (final (index, sample) in samples.indexed) {
+    for (final mode in [ThemeMode.light, ThemeMode.dark]) {
+      goldenTest('sections: ${sample.name}, ${mode.name}', (tester) async {
+        useSurface(tester, gallerySize);
+        await tester.pumpWidget(
+          ShowcaseApp(initialSample: index, initialMode: mode),
+        );
+        await settle(tester);
+        final first = index == 0;
+        // The "Screens" section is only two buttons; the screens themselves
+        // are photographed below.
+        final titles = first
+            ? gallerySections.where((title) => title != 'Screens')
+            : ['Palette', 'Buttons'];
+        for (final title in titles) {
+          final section = find.byKey(gallerySectionKey(title));
+          expect(section, findsOneWidget, reason: title);
+          final boundary = tester.renderObject<RenderRepaintBoundary>(section);
+          final file = first
+              ? 'components/${slug(title)}_${mode.name}.png'
+              : 'palettes/${slug(sample.name)}_${slug(title)}_${mode.name}.png';
+          await expectLater(
+            boundary.toImage(pixelRatio: 2),
+            matchesGoldenFile('goldens/$file'),
+          );
+        }
         await tester.pumpWidget(const SizedBox.shrink());
       });
     }
@@ -76,7 +126,7 @@ void main() {
         );
       }
 
-      testWidgets('about: ${sample.name}, ${brightness.name}', (tester) async {
+      goldenTest('about: ${sample.name}, ${brightness.name}', (tester) async {
         await shoot(
           tester,
           'about',
@@ -97,7 +147,7 @@ void main() {
         );
       });
 
-      testWidgets('licences: ${sample.name}, ${brightness.name}', (
+      goldenTest('licences: ${sample.name}, ${brightness.name}', (
         tester,
       ) async {
         await shoot(

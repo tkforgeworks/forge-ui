@@ -75,9 +75,10 @@ or `ForgeTokens`, so swapping the theme restyles every app.
 ## Showcase
 
 [`example/`](example) renders every component in light and dark with three
-sample seeds and one designed palette. Its tests are golden images; look at
-them in `example/test/goldens/` to see the current look without running
-anything.
+sample seeds and one designed palette. **[Its README](example/README.md) has
+a screenshot and a code example for each component**, so you can see the
+look without cloning or running anything. The screenshots are the showcase's
+golden-test images, so they cannot drift from the code.
 
 ```sh
 cd example
