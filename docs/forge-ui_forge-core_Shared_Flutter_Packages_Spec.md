@@ -1,6 +1,6 @@
 # forge-ui & forge-core: Shared Flutter Packages Spec
 
-Oct 8, 2026 · @Tim Klimpel · Status: Approved, ready to start
+Oct 8, 2026 · @Tim Klimpel · Status: Approved, ready to start · Revised Oct 10, 2026 (spec pass)
 
 ## Purpose and goals
 
@@ -27,9 +27,18 @@ Apps depend on both packages; the two packages never depend on each other. Share
 
 **Rule of three for promotion.** Code moves into a package only when a second app needs it, ideally after a third confirms its shape. Until then it lives in the app that uses it.
 
-&#91;embedded content: package layering · app, two packages, Supabase\]
+```mermaid
+flowchart TD
+  app["App<br/>seed color, icon, Supabase config, domain screens"]
+  ui["forge-ui<br/>theme, tokens, shared screens"]
+  core["forge-core<br/>sign-in, account, data"]
+  supabase[("The app's Supabase project")]
+  app -- "depends on" --> ui
+  app -- "depends on, passes its Supabase client" --> core
+  core -- "auth and data calls" --> supabase
+```
 
-Only `forge-core` talks to Supabase, and only the app knows which Supabase project it talks to.
+There is no arrow between the two packages. Only `forge-core` talks to Supabase, and only the app knows which Supabase project it talks to.
 
 ## forge-ui design
 
@@ -56,28 +65,60 @@ ThemeData forgeTheme({
 | --- | --- |
 | Typography and type scale | Seed color, optional accent |
 | Corner radii, spacing scale, elevation | App icon and name |
-| Button, card, input and dialog shapes | At most one signature component |
+| Button, card, input and dialog shapes |  |
 | Motion durations and curves |  |
-| Icon style |  |
+| Icon style (Heroicons, outline) |  |
 | "Made by tkforgeworks" about screen |  |
 
 **Hard rule: shared widgets never hardcode a color.** Every color comes from `Theme.of(context).colorScheme` or the `ForgeTokens` theme extension. One hardcoded color breaks theme swapping for every app.
 
-**Fonts are fixed and bundled in forge-ui.** Apps don't override them.
+**Fonts are fixed and bundled in forge-ui.** Apps don't override them. The three families are the ones the cheese app and the website already use:
+
+| Family | Role | Weights bundled |
+| --- | --- | --- |
+| Poppins | UI: titles, body, buttons, form fields | 400, 500, 600, 700 |
+| Source Serif 4 | Editorial: long-form text, names, taglines | 400 and 600, each with italic |
+| JetBrains Mono | Labels, tags and codes | 400, 500 |
 
 - The .ttf/.otf files live in `forge-ui/assets/fonts/` and are declared under `fonts:` in forge-ui's `pubspec.yaml`. Apps get them through the dependency, with no copying.
+- Static instances, not variable fonts, so `FontWeight` selects the face directly. The weights above are the starting set (the ones the cheese app ships); a new weight is added to the package before any widget uses it.
 - No runtime font download through `google_fonts`. A download is an undisclosed network call to Google and fails offline.
-- Only SIL Open Font License (OFL) fonts. `OFL.txt` ships beside the files, is listed in `NOTICE`, and is registered with `LicenseRegistry` so it shows on each app's licenses page.
+- Only SIL Open Font License (OFL) fonts. Each family's OFL text ships beside the files, is listed in `NOTICE`, and is registered with `LicenseRegistry` so it shows on each app's licenses page.
 - No commercial fonts unless their license explicitly covers app embedding. Modified OFL fonts get a new name.
 
-v1 widget set:
+**Icons are Heroicons, outline style.** `forge_ui` depends on the `heroicons` package (MIT) and its shared widgets use the outline style. Apps use the same package and style on their own screens.
 
-- Sign-in screen with Google and Apple buttons (callbacks in, no auth logic)
-- Account settings page: linked sign-in methods, sign out, delete account
-- Confirmation dialog, including the destructive delete confirmation
-- Empty, error and loading states
-- Form field styling
-- About screen with privacy policy and deletion links
+v1 widget set, by release:
+
+| Release | Ships | Alongside |
+| --- | --- | --- |
+| forge-ui v0.1 | Theme builder, tokens, buttons, cards, form field styling, confirmation dialog (including the destructive delete confirmation), empty, error and loading states, about screen with privacy policy and deletion links | — |
+| forge-ui v0.2 | Sign-in screen with Google and Apple buttons (callbacks in, no auth logic) | forge-core v0.1 |
+| forge-ui v0.3 | Account settings page: linked sign-in methods, sign out, delete account | forge-core v0.2 |
+
+The two screens that front `forge-core` ship with the `forge-core` release they pair with, so their callbacks are shaped against the real API rather than a guess.
+
+**Sign-in screen.** `onGoogle` and `onApple` are nullable callbacks. A null callback means that button is not rendered, which is how an Android app leaves out Apple until it is supported there. A debug assert requires at least one. On iOS an app passes both (Apple guideline 4.8).
+
+**Account settings page.** `forge-ui` cannot import `forge-core`, so it defines its own plain types for linked sign-in methods, and the app maps `forge-core`'s identities onto them. `forge-ui` owns each provider's label and logo, so every app shows them the same way.
+
+```dart
+enum ForgeSignInProvider { google, apple }
+
+@immutable
+class ForgeLinkedSignIn {
+  const ForgeLinkedSignIn({required this.provider, this.email});
+  final ForgeSignInProvider provider;
+  final String? email; // may be an Apple relay address
+}
+
+ForgeAccountSettings(
+  linked: [ForgeLinkedSignIn(provider: ForgeSignInProvider.google, email: email)],
+  onLink: (provider) {...}, // null hides "Link another sign-in method"
+  onSignOut: () {...},
+  onDeleteAccount: () {...},
+)
+```
 
 Material 3 is the base. If iOS later needs a more native feel, the platform adjustments go inside `forge-ui`, not in each app.
 
@@ -209,8 +250,9 @@ dependencies:
 
 Licensing follows the tkforgeworks org standards:
 
-- A `LICENSE` and `NOTICE` in each repo, with the license field set in `pubspec.yaml`.
-- `NOTICE` lists bundled third-party assets, starting with the fonts (SIL OFL, with `OFL.txt` shipped beside the files and registered in `LicenseRegistry`).
+- Both packages are Apache-2.0: a `LICENSE` (the verbatim Apache text) and a `NOTICE` in each repo. `pubspec.yaml` has no license field, because Dart has none; pub reads `LICENSE`.
+- Image assets are all rights reserved, as stated in `NOTICE`.
+- `NOTICE` lists bundled third-party assets, starting with the fonts (SIL OFL, with each family's OFL text shipped beside the files and registered in `LicenseRegistry`).
 - Third-party dependencies stay on licenses compatible with the package license; check before adding one.
 - Contributions are accepted under the repo's license via the org's contributing guidelines.
 
@@ -237,9 +279,9 @@ Sources: [Supabase: Login with Apple](https://supabase.com/docs/guides/auth/soci
 Work runs in five steps, with the cheese app as the first real consumer before any new app starts.
 
 1. **Repo setup.** Create both repos, run the org standards check, add CI and the empty showcase app.
-2. **forge-ui v0.1.** Theme builder, tokens, base components, showcase in light and dark with three seeds.
-3. **forge-core v0.1.** Native Google and Apple sign-in on iOS, Google native on Android (Apple on Android comes later), session state, jsonb repository helper.
-4. **Account and privacy v0.2.** Identity linking, deletion Edge Function with Apple revocation, privacy policy template, base data inventory, web deletion page and request form.
+2. **forge-ui v0.1.** Theme builder, tokens, base components, about screen, showcase in light and dark with three seeds.
+3. **forge-core v0.1.** Native Google and Apple sign-in on iOS, Google native on Android (Apple on Android comes later), session state, jsonb repository helper. forge-ui v0.2 ships the sign-in screen alongside.
+4. **Account and privacy v0.2.** Identity linking, deletion Edge Function with Apple revocation, privacy policy template, base data inventory, web deletion page and request form. forge-ui v0.3 ships the account settings page alongside.
 5. **Adopt.** Move the cheese app onto both packages before its first store release (its photo storage stays app-side for now), fix what that exposes, tag v1.0, then start the new app on v1.0.
 
 Later, outside these milestones: Apple sign-in on Android and web, shipped together with the client secret rotation job.
@@ -252,7 +294,13 @@ All review decisions are settled and reflected in the sections above.
 | --- | --- | --- |
 | Repo visibility | Public, relying on open-source licenses and future contributors | Repos, versioning and distribution |
 | Naming | Repos hyphenated (`forge-ui`, `forge-core`); Dart packages underscored (`forge_ui`, `forge_core`) | Repos, versioning and distribution |
-| Fonts | Fixed and bundled in `forge-ui` (OFL only); apps don't override | forge-ui design |
+| Fonts | Poppins (UI), Source Serif 4 (editorial) and JetBrains Mono (labels), fixed and bundled in `forge-ui` (OFL only); apps don't override | forge-ui design |
+| Icon style | Heroicons outline, through the `heroicons` package | forge-ui design |
+| Shared screen timing | About screen in forge-ui v0.1; sign-in screen in v0.2 with forge-core v0.1; account settings in v0.3 with forge-core v0.2 | forge-ui design, Milestones |
+| Hiding a sign-in provider | A null callback leaves the button out | forge-ui design |
+| Linked sign-in methods | `forge-ui` defines its own `ForgeSignInProvider` enum and `ForgeLinkedSignIn` type | forge-ui design |
+| Signature component | Dropped; the spec sets no limit on app-specific widgets | forge-ui design |
+| License | Apache-2.0 per the org standard; no license field in `pubspec.yaml` | Repos, versioning and distribution |
 | Apple sign-in on Android | Deferred; iOS native first | forge-core design |
 | Deletion logic | Lives in `forge-core`, synced into each app at its pinned tag | Account deletion |
 | Deleted data | Fully removed; no anonymized retention | Account deletion |
