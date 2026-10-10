@@ -7,10 +7,12 @@ theme builder, design tokens and the generic screens every client app repeats
 (sign-in, account settings, about, empty/error/loading states). Apps consume
 it as a git dependency pinned to a release tag and supply only their seed
 color, icon and domain screens. Its sibling `forge-core` (separate repo) owns
-sign-in, account and data plumbing. Current phase: repo setup; nothing is
-implemented and the v1 spec is still being finalised.
+sign-in, account and data plumbing. Current phase: repo setup done and the v1
+spec settled (2026-10-10); nothing is implemented yet.
 
-Spec: `docs/forge-ui_forge-core_Shared_Flutter_Packages_Spec.md`.
+Spec: `docs/forge-ui_forge-core_Shared_Flutter_Packages_Spec.md`. The same
+file lives in `forge-core/docs/`; the two copies must stay identical, so any
+spec change lands in both repos together.
 
 ## Stack & commands
 
@@ -69,6 +71,15 @@ Flutter package (Material 3), Flutter `3.47.5` pinned in `.github/workflows/ci.y
   `Theme.of(context).colorScheme` or the `ForgeTokens` theme extension, or
   theme swapping breaks for every app.
 - Code is promoted into the package only when a second app needs it.
+- Fonts are fixed and bundled as static instances: Poppins (UI), Source
+  Serif 4 (editorial), JetBrains Mono (labels). No `google_fonts`.
+- Icons are Heroicons outline, through the `heroicons` package (MIT).
+- Release scope: v0.1 is theme, tokens, base components and the about screen;
+  the sign-in screen ships in v0.2 with forge-core v0.1, and account settings
+  in v0.3 with forge-core v0.2.
+- A null `onGoogle` / `onApple` callback hides that sign-in button. Linked
+  sign-in methods use forge_ui's own `ForgeSignInProvider` enum and
+  `ForgeLinkedSignIn` type.
 
 ## Current status
 
@@ -76,8 +87,9 @@ As of 2026-10-10: repo setup to org standards is done and on `main` (PRs #1
 and #2, checked against `tkforgeworks/.github` @ `be3ad49`). Both rulesets are
 live: `main` (id 24830672, required check `ci / ci`) and `release-branches`
 (id 24830561). No tag or release exists. The package is an empty skeleton with
-one placeholder test. No implementation starts until the spec pass below is
-done.
+one placeholder test. The spec pass is done: Tim decided every gap on
+2026-10-10 and the decisions are written into the spec (its Decisions table
+lists them).
 
 ## Next actions
 
@@ -85,40 +97,20 @@ done.
 every change, including edits to this file and the spec, goes through a topic
 branch and a PR into `v0.1.0/main`.
 
-1. Spec pass: walk the "Spec gaps" list below with Tim, get a decision on each,
-   and write the decisions into
-   `docs/forge-ui_forge-core_Shared_Flutter_Packages_Spec.md`.
-2. Only after the spec is settled: finish spec milestone 1 (empty showcase app
-   under `example/`), then start forge-ui v0.1 (milestone 2).
+1. Finish spec milestone 1: the empty showcase app under `example/`.
+2. Start forge-ui v0.1 (milestone 2): theme builder, tokens, base components,
+   about screen, showcase in light and dark with three seeds.
 
 ## Open items
 
-### Spec gaps (need a decision from Tim unless marked settled)
+### Spec
 
-- **Fonts are not named.** The spec says fixed, bundled and OFL-only but picks
-  no typefaces; this blocks `ForgeType`. Candidates: Poppins, JetBrains Mono
-  and Source Serif 4, which the org's parked brand doc
-  (`tkforgeworks/.github/docs/future-brand-and-plugins.md`) lists as the
-  existing brand fonts. Tim has not confirmed them. That doc says the files
-  live in a `tkforgeworks-design` skill folder, which is not on this machine.
-  Check each font's `OFL.txt` when bundling.
-- **Timing of the shared screens.** Sign-in, account settings and about are in
-  the v1 widget set, but milestone 2 (v0.1) only says "base components".
-  Decide whether they ship in v0.1 or alongside forge-core v0.1 / v0.2.
-- **Apple button on Android.** Apple sign-in there is deferred, so the sign-in
-  screen must be able to hide a provider (for example a null callback).
-- **Account settings data shape.** `forge_ui` cannot import `forge_core`, so
-  the "linked sign-in methods" list needs its own plain data type in
-  `forge_ui`. Not specified.
-- **Icon style** is listed as fixed by the brand but not defined.
-- **"At most one signature component" per app** is not defined.
-- **Package-layering diagram** is missing; the markdown export left only an
-  `[embedded content]` placeholder.
-- **Settled, write into the spec:** the license is Apache-2.0 per the org
-  standard, and the line asking for a license field in `pubspec.yaml` should
-  be dropped because Dart has none.
-- **Not blocking:** seed color for each existing app (the spec's own open
-  item; the showcase uses sample seeds).
+- **Seed color for each existing app** is the spec's one remaining open item.
+  It does not block v0.1; the showcase uses sample seeds.
+- **Bundling the fonts.** The cheese app already ships the ten static files
+  and their OFL texts (`cheesy-scribe/assets/fonts/`, sources and versions in
+  its `LICENSES.md`). Take the files from the upstream sources named there,
+  check each family's OFL text, and list them in `NOTICE`.
 
 ### Repo and process
 
