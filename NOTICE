@@ -39,3 +39,6 @@ assets/fonts/LICENSES.md.
                    assets/fonts/licenses/SourceSerif4-OFL.md
   JetBrains Mono   Copyright 2020 The JetBrains Mono Project Authors
                    assets/fonts/licenses/JetBrainsMono-OFL.txt
+
+The launcher icons under example/android/ are the Flutter project template's
+(Copyright The Flutter Authors, BSD 3-Clause).
