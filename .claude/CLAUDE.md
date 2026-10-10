@@ -128,8 +128,9 @@ by hand.
 edits to this file and the spec, goes through a topic branch and a PR into
 `v0.1.0/main`.
 
-1. Release v0.1.0 so the cheese app can pin a tag: decide on the release
-   pipeline (see open items), then the release PR `v0.1.0/main` → `main`.
+1. Release v0.1.0 so the cheese app can pin a tag: after PR #5 merges, adopt
+   the release pipeline (see open items), cut a release candidate to test
+   it, then the release PR `v0.1.0/main` → `main`.
 2. Adopt it in the cheese app (a ticket in that repo): depend on the tag,
    replace `ScribeTheme` with `forgeTheme` plus its own palette and a slimmed
    `ScribeColors` extension (dotted line, stars, wheel grid), swap its
@@ -145,17 +146,24 @@ edits to this file and the spec, goes through a topic branch and a PR into
 
 ### Repo and process
 
-- **Jira project.** None exists for forge-ui. Until Tim creates one, follow
-  the no-key convention above. When it exists, switch branch names and
-  subjects to the keyed form and remove the deviation from
-  `.github/org-standards.yml`.
-- **Release pipeline.** Deferred until v0.1 is close. Before adopting, note:
-  `release-flutter.yml` with `build-windows` and `build-android` both false
-  looks like a fit for tagging a package but no repo has run it that way; it
-  needs a `JIRA_BASE_URL` variable and a `ticket-prefix`; the bump scripts get
-  vendored into `scripts/release/`; and once `release.yml` exists, any merge
-  to `main` whose `pubspec.yaml` version has no tag publishes a stable
-  release.
+- **Jira project.** None exists for forge-ui, and Tim does not want one yet
+  (decided 2026-10-10). Follow the no-key convention above. If one is ever
+  created, switch branch names and subjects to the keyed form and remove the
+  deviation from `.github/org-standards.yml`.
+- **Release pipeline.** Decided 2026-10-10: adopt the org pipeline in its own
+  PR after PR #5 merges, and apps pin an **exact tag** (`ref: vX.Y.Z`), as
+  the spec says. A caret constraint through `tag_pattern` was considered and
+  turned down; it also fails to resolve while `pubspec.yaml` carries
+  `+BUILD`. What adoption needs:
+  - a `release.yml` calling `release-flutter.yml@main` with `build-windows`
+    and `build-android` both false. No repo has run it that way, so the first
+    release candidate is also the pipeline test;
+  - no `ticket-prefix` and no `JIRA_BASE_URL`: release notes are then the
+    plain commit subjects. This needs `tkforgeworks/.github` PR #15 (makes
+    the input optional) merged first; until then the input is required;
+  - `bump-version.{sh,ps1}` vendored into `scripts/release/`;
+  - care with the first merge: once `release.yml` exists, any merge to `main`
+    whose `pubspec.yaml` version has no tag publishes a stable release.
 - **`v0.0.1/main` still exists.** It is fully merged, has no tag, and the
   `release-branches` ruleset blocks deleting it. Removing it means disabling
   that ruleset briefly, which needs Tim's explicit yes.
