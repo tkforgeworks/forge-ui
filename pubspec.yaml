@@ -1,6 +1,6 @@
 name: forge_ui
 description: Shared tkforgeworks brand theme and generic screens for Flutter apps.
-version: 0.0.1+1
+version: 0.1.0+1
 repository: https://github.com/tkforgeworks/forge-ui
 # Consumed as a git dependency pinned to a release tag, not from pub.dev.
 publish_to: none
