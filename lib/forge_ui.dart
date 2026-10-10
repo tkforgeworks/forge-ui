@@ -6,6 +6,9 @@
 /// `docs/forge-ui_forge-core_Shared_Flutter_Packages_Spec.md`.
 library;
 
+export 'src/font_licenses.dart' show registerForgeFontLicenses;
+export 'src/screens/forge_about_screen.dart';
+export 'src/screens/forge_licenses_screen.dart';
 export 'src/theme/forge_brand.dart';
 export 'src/theme/forge_theme.dart';
 export 'src/theme/forge_tokens.dart';
