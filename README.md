@@ -4,23 +4,28 @@ Shared Flutter package (`forge_ui`) carrying the tkforgeworks brand look: one
 theme builder, design tokens, shared widgets and the generic screens every
 app repeats. Each app supplies only its colors, icon and domain screens.
 
-**Status:** v0.1.0 is implemented on `v0.1.0/main` and not yet tagged. It
-holds the theme, the shared widgets and the about and licences screens. The
-sign-in screen (v0.2) and account settings (v0.3) follow with `forge-core`.
+**Status:** `v0.1.0-rc.1` is published as a prerelease; `v0.1.0` follows once
+the first app has adopted it. It holds the theme, the shared widgets and the
+about and licences screens. The sign-in screen (v0.2) and account settings
+(v0.3) follow with `forge-core`.
 The v1 scope is in
 [`docs/forge-ui_forge-core_Shared_Flutter_Packages_Spec.md`](docs/forge-ui_forge-core_Shared_Flutter_Packages_Spec.md).
 
 ## Using it
 
-Add the package as a git dependency pinned to a release tag:
+Add the package as a git dependency pinned to an exact release tag (see
+[releases](https://github.com/tkforgeworks/forge-ui/releases) for the
+current one):
 
 ```yaml
 dependencies:
   forge_ui:
     git:
       url: https://github.com/tkforgeworks/forge-ui.git
-      ref: v0.1.0
+      ref: v0.1.0-rc.1
 ```
+
+Changing that `ref` is the only way an app picks up a new version.
 
 Then build both themes from the app's seed color:
 

@@ -7,8 +7,8 @@ theme builder, design tokens and the generic screens every client app repeats
 (sign-in, account settings, about, empty/error/loading states). Apps consume
 it as a git dependency pinned to a release tag and supply only their seed
 color, icon and domain screens. Its sibling `forge-core` (separate repo) owns
-sign-in, account and data plumbing. Current phase: v0.1.0 is implemented on
-the release branch and waiting to be released; the cheese app
+sign-in, account and data plumbing. Current phase: `v0.1.0-rc.1` is published
+and waiting to be adopted; the cheese app
 (`tkforgeworks/cheesy-scribe`) is its first consumer and the reference for
 what v0.1 contains.
 
@@ -123,9 +123,9 @@ means updating the gallery section, its golden and that README together.
 As of 2026-10-10: repo setup to org standards is done and on `main` (PRs #1
 and #2, checked against `tkforgeworks/.github` @ `be3ad49`). Both rulesets are
 live: `main` (id 24830672, required check `ci / ci`) and `release-branches`
-(id 24830561). No tag or release exists. The spec is settled (PR #4).
+(id 24830561). The spec is settled (PR #4).
 
-forge-ui v0.1 is built on `v0.1.0/theme-and-components`: bundled fonts,
+forge-ui v0.1 is built and on `v0.1.0/main` (PR #5): bundled fonts,
 `forgeTheme` with tokens and every component theme, the shared widgets, the
 about and licences screens, and the showcase with goldens. What moved in is
 the cheese app's generic layer (its `ScribeTheme`, `app/widgets/` and
@@ -133,20 +133,24 @@ about/licences screens), renamed and with the palette taken out. The showcase
 builds for Linux but has only been exercised through its tests, not launched
 by hand.
 
+`v0.1.0-rc.1` was published on 2026-10-10 (commit `47b16bf`), the first run
+of the org Flutter pipeline with both builds off: it produced the tag and a
+prerelease with notes and no files. A scratch app pinning `ref: v0.1.0-rc.1`
+resolved it from GitHub and ran a widget test against it.
+
 ## Next actions
 
 `pubspec.yaml` is at `0.1.0+1`. `main` is PR-only, so every change, including
 edits to this file and the spec, goes through a topic branch and a PR into
 `v0.1.0/main`.
 
-1. Release v0.1.0 so the cheese app can pin a tag: cut `v0.1.0-rc.1` (the
-   first run of the pipeline with both builds off), adopt it in the cheese
-   app, fix what that exposes with further release candidates, then
-   `bump-version.sh final` and the release PR `v0.1.0/main` → `main`.
-2. Adopt it in the cheese app (a ticket in that repo): depend on the tag,
+1. Adopt `v0.1.0-rc.1` in the cheese app (a ticket in that repo): depend on
+   the tag,
    replace `ScribeTheme` with `forgeTheme` plus its own palette and a slimmed
    `ScribeColors` extension (dotted line, stars, wheel grid), swap its
    `app/widgets/` atoms for the `Forge*` ones, and drop its font assets.
+2. Fix what adoption exposes with further release candidates, then
+   `bump-version.sh final` and the release PR `v0.1.0/main` → `main`.
 3. forge-ui v0.2: the sign-in screen, alongside forge-core v0.1.
 
 ## Open items
