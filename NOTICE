@@ -25,3 +25,20 @@ NAMES AND MARKS
 this work. As Section 6 of the Apache License states, no trademark license is
 granted. Forks and derivatives must not present themselves as TK ForgeWorks
 products.
+
+THIRD-PARTY ASSETS
+
+Bundled fonts, each under the SIL Open Font License 1.1. The licence texts
+ship in assets/fonts/licenses/ and the sources are listed in
+assets/fonts/LICENSES.md.
+
+  Poppins          Copyright 2020 The Poppins Project Authors
+                   assets/fonts/licenses/Poppins-OFL.txt
+  Source Serif 4   Copyright 2014 - 2023 Adobe, with Reserved Font Name
+                   'Source'
+                   assets/fonts/licenses/SourceSerif4-OFL.md
+  JetBrains Mono   Copyright 2020 The JetBrains Mono Project Authors
+                   assets/fonts/licenses/JetBrainsMono-OFL.txt
+
+The launcher icons under example/android/ are the Flutter project template's
+(Copyright The Flutter Authors, BSD 3-Clause).

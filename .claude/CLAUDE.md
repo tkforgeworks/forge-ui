@@ -7,8 +7,10 @@ theme builder, design tokens and the generic screens every client app repeats
 (sign-in, account settings, about, empty/error/loading states). Apps consume
 it as a git dependency pinned to a release tag and supply only their seed
 color, icon and domain screens. Its sibling `forge-core` (separate repo) owns
-sign-in, account and data plumbing. Current phase: repo setup done and the v1
-spec settled (2026-10-10); nothing is implemented yet.
+sign-in, account and data plumbing. Current phase: v0.1.0 is implemented on
+the release branch and waiting to be released; the cheese app
+(`tkforgeworks/cheesy-scribe`) is its first consumer and the reference for
+what v0.1 contains.
 
 Spec: `docs/forge-ui_forge-core_Shared_Flutter_Packages_Spec.md`. The same
 file lives in `forge-core/docs/`; the two copies must stay identical, so any
@@ -24,6 +26,17 @@ Flutter package (Material 3), Flutter `3.47.5` pinned in `.github/workflows/ci.y
 | Format | `dart format .` |
 | Analyze | `flutter analyze` |
 | Test | `flutter test` |
+| Showcase goldens | `cd example && flutter test` |
+| Regenerate goldens | `cd example && flutter test --update-goldens` |
+
+Layout: `lib/forge_ui.dart` is the only public library and exports everything
+under `lib/src/` (`theme/`, `widgets/`, `screens/`). Fonts and their OFL texts
+are in `assets/fonts/`. `example/` is the showcase app; its tests are golden
+images under `example/test/goldens/` and run as the `showcase / ci` job. Read
+the golden PNGs to see the current look without running anything.
+`example/README.md` is the component catalogue: it embeds those same PNGs
+beside a code example for each component, so a new or changed component
+means updating the gallery section, its golden and that README together.
 
 ## Repo & process conventions (org standard)
 
@@ -71,6 +84,19 @@ Flutter package (Material 3), Flutter `3.47.5` pinned in `.github/workflows/ci.y
   `Theme.of(context).colorScheme` or the `ForgeTokens` theme extension, or
   theme swapping breaks for every app.
 - Code is promoted into the package only when a second app needs it.
+- **The one exception to the color rule is `ForgeBrand`** (the forge gradient
+  and the mark's colors), plus the success pair inside `forge_tokens.dart`.
+  `test/no_hardcoded_colors_test.dart` fails on a color literal anywhere else
+  in `lib/`.
+- `forgeTheme` takes a seed; an app with a designed palette also passes its
+  own `colorScheme` and `tokens` (one pair per brightness) and its own
+  extensions through `extensions`. The cheese app uses that path.
+- Font families are declared in this package, so styles must set
+  `package: 'forge_ui'` (go through `ForgeType`); the resolved family is
+  `packages/forge_ui/Poppins`.
+- Every public name is prefixed `Forge` (`forge` for functions).
+- No named spacing or motion tokens exist yet. The cheese app has none to
+  promote, so none were invented; add them when a real need shows up.
 - Fonts are fixed and bundled as static instances: Poppins (UI), Source
   Serif 4 (editorial), JetBrains Mono (labels). No `google_fonts`.
 - Icons are Heroicons outline, through the `heroicons` package (MIT).
@@ -86,47 +112,61 @@ Flutter package (Material 3), Flutter `3.47.5` pinned in `.github/workflows/ci.y
 As of 2026-10-10: repo setup to org standards is done and on `main` (PRs #1
 and #2, checked against `tkforgeworks/.github` @ `be3ad49`). Both rulesets are
 live: `main` (id 24830672, required check `ci / ci`) and `release-branches`
-(id 24830561). No tag or release exists. The package is an empty skeleton with
-one placeholder test. The spec pass is done: Tim decided every gap on
-2026-10-10 and the decisions are written into the spec (its Decisions table
-lists them).
+(id 24830561). No tag or release exists. The spec is settled (PR #4).
+
+forge-ui v0.1 is built on `v0.1.0/theme-and-components`: bundled fonts,
+`forgeTheme` with tokens and every component theme, the shared widgets, the
+about and licences screens, and the showcase with goldens. What moved in is
+the cheese app's generic layer (its `ScribeTheme`, `app/widgets/` and
+about/licences screens), renamed and with the palette taken out. The showcase
+builds for Linux but has only been exercised through its tests, not launched
+by hand.
 
 ## Next actions
 
-`v0.1.0/main` is cut and `pubspec.yaml` is at `0.1.0+1`. `main` is PR-only, so
-every change, including edits to this file and the spec, goes through a topic
-branch and a PR into `v0.1.0/main`.
+`pubspec.yaml` is at `0.1.0+1`. `main` is PR-only, so every change, including
+edits to this file and the spec, goes through a topic branch and a PR into
+`v0.1.0/main`.
 
-1. Finish spec milestone 1: the empty showcase app under `example/`.
-2. Start forge-ui v0.1 (milestone 2): theme builder, tokens, base components,
-   about screen, showcase in light and dark with three seeds.
+1. Release v0.1.0 so the cheese app can pin a tag: after PR #5 merges, adopt
+   the release pipeline (see open items), cut a release candidate to test
+   it, then the release PR `v0.1.0/main` → `main`.
+2. Adopt it in the cheese app (a ticket in that repo): depend on the tag,
+   replace `ScribeTheme` with `forgeTheme` plus its own palette and a slimmed
+   `ScribeColors` extension (dotted line, stars, wheel grid), swap its
+   `app/widgets/` atoms for the `Forge*` ones, and drop its font assets.
+3. forge-ui v0.2: the sign-in screen, alongside forge-core v0.1.
 
 ## Open items
 
 ### Spec
 
 - **Seed color for each existing app** is the spec's one remaining open item.
-  It does not block v0.1; the showcase uses sample seeds.
-- **Bundling the fonts.** The cheese app already ships the ten static files
-  and their OFL texts (`cheesy-scribe/assets/fonts/`, sources and versions in
-  its `LICENSES.md`). Take the files from the upstream sources named there,
-  check each family's OFL text, and list them in `NOTICE`.
+  The cheese app's is rind amber `#B3641B`, with its designed scheme.
 
 ### Repo and process
 
-- **Jira project.** None exists for forge-ui. Until Tim creates one, follow
-  the no-key convention above. When it exists, switch branch names and
-  subjects to the keyed form and remove the deviation from
-  `.github/org-standards.yml`.
-- **Release pipeline.** Deferred until v0.1 is close. Before adopting, note:
-  `release-flutter.yml` with `build-windows` and `build-android` both false
-  looks like a fit for tagging a package but no repo has run it that way; it
-  needs a `JIRA_BASE_URL` variable and a `ticket-prefix`; the bump scripts get
-  vendored into `scripts/release/`; and once `release.yml` exists, any merge
-  to `main` whose `pubspec.yaml` version has no tag publishes a stable
-  release.
+- **Jira project.** None exists for forge-ui, and Tim does not want one yet
+  (decided 2026-10-10). Follow the no-key convention above. If one is ever
+  created, switch branch names and subjects to the keyed form and remove the
+  deviation from `.github/org-standards.yml`.
+- **Release pipeline.** Decided 2026-10-10: adopt the org pipeline in its own
+  PR after PR #5 merges, and apps pin an **exact tag** (`ref: vX.Y.Z`), as
+  the spec says. A caret constraint through `tag_pattern` was considered and
+  turned down; it also fails to resolve while `pubspec.yaml` carries
+  `+BUILD`. What adoption needs:
+  - a `release.yml` calling `release-flutter.yml@main` with `build-windows`
+    and `build-android` both false. No repo has run it that way, so the first
+    release candidate is also the pipeline test;
+  - no `ticket-prefix` and no `JIRA_BASE_URL`: release notes are then the
+    plain commit subjects. This needs `tkforgeworks/.github` PR #15 (makes
+    the input optional) merged first; until then the input is required;
+  - `bump-version.{sh,ps1}` vendored into `scripts/release/`;
+  - care with the first merge: once `release.yml` exists, any merge to `main`
+    whose `pubspec.yaml` version has no tag publishes a stable release.
 - **`v0.0.1/main` still exists.** It is fully merged, has no tag, and the
   `release-branches` ruleset blocks deleting it. Removing it means disabling
   that ruleset briefly, which needs Tim's explicit yes.
-- **Placeholder test.** Replace `test/forge_ui_test.dart` when the first
-  component lands.
+- **Goldens are compared exactly.** They were generated on Linux with
+  Flutter 3.47.5, the version CI pins. Bumping Flutter means regenerating
+  them in the same PR.
