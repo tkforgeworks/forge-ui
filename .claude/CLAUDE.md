@@ -140,18 +140,19 @@ resolved it from GitHub and ran a widget test against it.
 
 ## Next actions
 
-`pubspec.yaml` is at `0.1.0+1`. `main` is PR-only, so every change, including
-edits to this file and the spec, goes through a topic branch and a PR into
-`v0.1.0/main`.
+`pubspec.yaml` is at `0.1.0-rc.1+2`. `main` is PR-only, so every change,
+including edits to this file and the spec, goes through a topic branch and a
+PR into `v0.1.0/main`.
 
-1. Adopt `v0.1.0-rc.1` in the cheese app (a ticket in that repo): depend on
-   the tag,
-   replace `ScribeTheme` with `forgeTheme` plus its own palette and a slimmed
-   `ScribeColors` extension (dotted line, stars, wheel grid), swap its
-   `app/widgets/` atoms for the `Forge*` ones, and drop its font assets.
-2. Fix what adoption exposes with further release candidates, then
-   `bump-version.sh final` and the release PR `v0.1.0/main` → `main`.
-3. forge-ui v0.2: the sign-in screen, alongside forge-core v0.1.
+1. The cheese app adopts `v0.1.0-rc.1` under **CHEESE-48** (fix version
+   0.1.1 of that app, worked in the cheesy-scribe repo; the ticket carries the
+   old-name-to-new-name mapping). Its 0.1.0 store release ships first, so
+   this waits on that app's `v0.1.1/main`.
+2. Fix what adoption exposes here, each fix followed by a new release
+   candidate (`bump-version.sh rc`) that CHEESE-48 re-pins to.
+3. When the cheese app is happy: `bump-version.sh final` and the release PR
+   `v0.1.0/main` → `main`, which publishes `v0.1.0`.
+4. forge-ui v0.2: the sign-in screen, alongside forge-core v0.1.
 
 ## Open items
 
@@ -166,10 +167,10 @@ edits to this file and the spec, goes through a topic branch and a PR into
   (decided 2026-10-10). Follow the no-key convention above. If one is ever
   created, switch branch names and subjects to the keyed form and remove the
   deviation from `.github/org-standards.yml`.
-- **Release pipeline gate.** The org `release-flutter.yml` publishes even
-  when its CI gate fails (the `publish` job does not depend on `gate`). Until
-  that is fixed in `tkforgeworks/.github`, check that CI is green on the
-  release branch before cutting a release candidate or finalizing.
+- **Release pipeline gate.** Fixed in the org workflow on 2026-10-10
+  (`tkforgeworks/.github` PR #16): `publish` now requires the CI gate to have
+  passed. No release has run under the fix with a failing gate, so the first
+  time a gate fails, confirm that nothing was published.
 - **`v0.0.1/main` still exists.** It is fully merged, has no tag, and the
   `release-branches` ruleset blocks deleting it. Removing it means disabling
   that ruleset briefly, which needs Tim's explicit yes.
