@@ -28,6 +28,8 @@ Flutter package (Material 3), Flutter `3.47.5` pinned in `.github/workflows/ci.y
 | Test | `flutter test` |
 | Showcase goldens | `cd example && flutter test` |
 | Regenerate goldens | `cd example && flutter test --update-goldens` |
+| Cut a release candidate | `scripts/release/bump-version.sh rc` (on `vX.Y.Z/main`) |
+| Finalize a release | `scripts/release/bump-version.sh final` (on `vX.Y.Z/main`) |
 
 Layout: `lib/forge_ui.dart` is the only public library and exports everything
 under `lib/src/` (`theme/`, `widgets/`, `screens/`). Fonts and their OFL texts
@@ -62,10 +64,19 @@ means updating the gallery section, its golden and that README together.
   `vX.Y.Z/<short-topic>` and subjects carry no key. Once it exists: branches
   become `vX.Y.Z/<KEY>-N-short-topic`, subjects `<KEY>-N: Imperative summary`,
   and the deviation in `.github/org-standards.yml` is removed.
-- Releases: the org release pipeline is **not adopted yet** (deferred until
-  v0.1 is close). **Never hand-edit the version or push tags** once it is;
-  `pubspec.yaml` holds the upcoming version of the current release branch as
-  `X.Y.Z+BUILD`.
+- Releases: `.github/workflows/release.yml` consumes the org
+  `release-flutter.yml` with both platform builds off, so a release is a tag
+  and a GitHub release with notes and no files. On the release branch,
+  `scripts/release/bump-version.sh rc` publishes prerelease `vX.Y.Z-rc.N`;
+  `bump-version.sh final` opens the release PR, and merging it into `main`
+  publishes `vX.Y.Z`. **Never hand-edit the version or push tags**; the
+  workflow creates the tag. `pubspec.yaml` holds the upcoming version as
+  `X.Y.Z[-rc.N]+BUILD` (the build number means nothing for a package but the
+  bump script requires it). No `ticket-prefix`, so release notes are the
+  commit subjects. The bump scripts are vendored copies of the org ones
+  (`tkforgeworks/.github` @ `a800dd1`); don't edit them here.
+- Apps consume a release as a git dependency pinned to an **exact tag**
+  (`ref: vX.Y.Z`). Bumping that line is the only way an app picks up a change.
 - License: **Apache-2.0** (`LICENSE` is the verbatim Apache text — never
   edit it). Image assets (`.svg`/`.png`/etc.) are **all rights reserved** via
   `NOTICE`. `pubspec.yaml` has no license field. Bundled third-party assets
@@ -128,9 +139,10 @@ by hand.
 edits to this file and the spec, goes through a topic branch and a PR into
 `v0.1.0/main`.
 
-1. Release v0.1.0 so the cheese app can pin a tag: after PR #5 merges, adopt
-   the release pipeline (see open items), cut a release candidate to test
-   it, then the release PR `v0.1.0/main` → `main`.
+1. Release v0.1.0 so the cheese app can pin a tag: cut `v0.1.0-rc.1` (the
+   first run of the pipeline with both builds off), adopt it in the cheese
+   app, fix what that exposes with further release candidates, then
+   `bump-version.sh final` and the release PR `v0.1.0/main` → `main`.
 2. Adopt it in the cheese app (a ticket in that repo): depend on the tag,
    replace `ScribeTheme` with `forgeTheme` plus its own palette and a slimmed
    `ScribeColors` extension (dotted line, stars, wheel grid), swap its
@@ -150,20 +162,10 @@ edits to this file and the spec, goes through a topic branch and a PR into
   (decided 2026-10-10). Follow the no-key convention above. If one is ever
   created, switch branch names and subjects to the keyed form and remove the
   deviation from `.github/org-standards.yml`.
-- **Release pipeline.** Decided 2026-10-10: adopt the org pipeline in its own
-  PR after PR #5 merges, and apps pin an **exact tag** (`ref: vX.Y.Z`), as
-  the spec says. A caret constraint through `tag_pattern` was considered and
-  turned down; it also fails to resolve while `pubspec.yaml` carries
-  `+BUILD`. What adoption needs:
-  - a `release.yml` calling `release-flutter.yml@main` with `build-windows`
-    and `build-android` both false. No repo has run it that way, so the first
-    release candidate is also the pipeline test;
-  - no `ticket-prefix` and no `JIRA_BASE_URL`: release notes are then the
-    plain commit subjects. This needs `tkforgeworks/.github` PR #15 (makes
-    the input optional) merged first; until then the input is required;
-  - `bump-version.{sh,ps1}` vendored into `scripts/release/`;
-  - care with the first merge: once `release.yml` exists, any merge to `main`
-    whose `pubspec.yaml` version has no tag publishes a stable release.
+- **Release pipeline gate.** The org `release-flutter.yml` publishes even
+  when its CI gate fails (the `publish` job does not depend on `gate`). Until
+  that is fixed in `tkforgeworks/.github`, check that CI is green on the
+  release branch before cutting a release candidate or finalizing.
 - **`v0.0.1/main` still exists.** It is fully merged, has no tag, and the
   `release-branches` ruleset blocks deleting it. Removing it means disabling
   that ruleset briefly, which needs Tim's explicit yes.

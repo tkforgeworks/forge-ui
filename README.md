@@ -99,7 +99,10 @@ After an intended visual change, regenerate the goldens with
 `flutter test --update-goldens` in `example/` and review the images.
 
 Work lands by pull request into the current release branch (`vX.Y.Z/main`),
-which reaches `main` through a release PR. See the org
+which reaches `main` through a release PR. Releases are cut with
+`scripts/release/bump-version.sh rc` (a prerelease tag from the release
+branch) and `bump-version.sh final` (the release PR); the release workflow
+creates the tags. See the org
 [contributing guide](https://github.com/tkforgeworks/.github/blob/main/CONTRIBUTING.md).
 
 ## License
