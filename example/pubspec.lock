@@ -89,7 +89,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.1.0+1"
+    version: "0.1.0-rc.1+2"
   heroicons:
     dependency: "direct main"
     description:
@@ -313,4 +313,4 @@ packages:
     version: "7.0.1"
 sdks:
   dart: ">=3.13.4 <4.0.0"
-  flutter: ">=3.47.0"
+  flutter: ">=3.47.2"
