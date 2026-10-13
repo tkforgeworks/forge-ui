@@ -19,6 +19,11 @@ spec change lands in both repos together.
 ## Stack & commands
 
 Flutter package (Material 3), Flutter `3.47.5` pinned in `.github/workflows/ci.yml`.
+`pubspec.yaml`'s `environment` is a separate, lower floor (Dart `^3.13.2`,
+Flutter `>=3.47.2`): the oldest toolchain a consuming app pins. `flutter
+create` writes the current SDK there, which locks out every app on an older
+patch at `pub get` (cheesy-scribe's CI, on Flutter 3.47.2, could not resolve
+`v0.1.0-rc.1`). Raise it only when the code needs a newer SDK.
 
 | Task | Command |
 |---|---|
@@ -149,7 +154,8 @@ PR into `v0.1.0/main`.
    old-name-to-new-name mapping). Its 0.1.0 store release ships first, so
    this waits on that app's `v0.1.1/main`.
 2. Fix what adoption exposes here, each fix followed by a new release
-   candidate (`bump-version.sh rc`) that CHEESE-48 re-pins to.
+   candidate (`bump-version.sh rc`) that CHEESE-48 re-pins to. First one
+   (2026-10-13): the SDK floor, which needs `v0.1.0-rc.2`.
 3. When the cheese app is happy: `bump-version.sh final` and the release PR
    `v0.1.0/main` → `main`, which publishes `v0.1.0`.
 4. forge-ui v0.2: the sign-in screen, alongside forge-core v0.1.
