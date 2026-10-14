@@ -139,6 +139,7 @@ void main() {
                 'to guess what a button looks like in dark mode.',
             footnote: 'Nothing here leaves this device.',
             tintMark: sample.tintMark,
+            onSendFeedback: () {},
             onOpenWebsite: () {},
             onOpenPrivacyPolicy: () {},
             onOpenDeleteAccount: () {},

@@ -25,6 +25,7 @@ class ForgeAboutScreen extends StatelessWidget {
     this.badge,
     this.version,
     this.blurb,
+    this.onSendFeedback,
     this.onOpenWebsite,
     this.onOpenDeleteAccount,
     this.onOpenLicenses,
@@ -32,6 +33,7 @@ class ForgeAboutScreen extends StatelessWidget {
     this.tintMark = false,
   });
 
+  static const feedbackKey = Key('forge-about-feedback');
   static const websiteKey = Key('forge-about-website');
   static const privacyKey = Key('forge-about-privacy');
   static const deleteAccountKey = Key('forge-about-delete-account');
@@ -57,6 +59,9 @@ class ForgeAboutScreen extends StatelessWidget {
 
   /// One paragraph about the app, in the app's voice.
   final String? blurb;
+
+  /// Opens the app's own feedback screen. Leave null to hide the row.
+  final VoidCallback? onSendFeedback;
 
   /// Opens tkforgeworks.com.
   final VoidCallback? onOpenWebsite;
@@ -141,6 +146,13 @@ class ForgeAboutScreen extends StatelessWidget {
           const SizedBox(height: 22),
           ForgeSettingsGroup(
             children: [
+              if (onSendFeedback != null)
+                link(
+                  feedbackKey,
+                  'Send feedback',
+                  onSendFeedback!,
+                  external: false,
+                ),
               if (onOpenWebsite != null)
                 link(websiteKey, 'tkforgeworks.com', onOpenWebsite!),
               link(privacyKey, 'Privacy policy', onOpenPrivacyPolicy),

@@ -63,6 +63,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
         'the lights, and check your work against mine.',
     footnote: 'Nothing here leaves this device.',
     tintMark: widget.sample.tintMark,
+    onSendFeedback: () => _say('Would open the feedback screen.'),
     onOpenWebsite: () => _say('Would open tkforgeworks.com.'),
     onOpenPrivacyPolicy: () => _say('Would open the privacy policy.'),
     onOpenDeleteAccount: () => _say('Would open the deletion page.'),

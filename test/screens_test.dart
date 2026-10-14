@@ -34,6 +34,7 @@ void main() {
             badge: const FlutterLogo(size: 64),
             blurb: 'I keep your cheese notes.',
             footnote: 'Your notes stay on this device.',
+            onSendFeedback: () => opened.add('feedback'),
             onOpenWebsite: () => opened.add('site'),
             onOpenPrivacyPolicy: () => opened.add('privacy'),
             onOpenDeleteAccount: () => opened.add('delete'),
@@ -54,11 +55,12 @@ void main() {
       expect(find.byType(FlutterLogo), findsOneWidget);
       expect(find.text('Your notes stay on this device.'), findsOneWidget);
 
+      await tester.tap(find.byKey(ForgeAboutScreen.feedbackKey));
       await tester.tap(find.byKey(ForgeAboutScreen.websiteKey));
       await tester.tap(find.byKey(ForgeAboutScreen.privacyKey));
       await tester.tap(find.byKey(ForgeAboutScreen.deleteAccountKey));
       await tester.tap(find.byKey(ForgeAboutScreen.licensesKey));
-      expect(opened, ['site', 'privacy', 'delete', 'licenses']);
+      expect(opened, ['feedback', 'site', 'privacy', 'delete', 'licenses']);
     });
 
     testWidgets('a null callback leaves that link out', (tester) async {
@@ -68,6 +70,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text('Privacy policy'), findsOneWidget);
+      expect(find.text('Send feedback'), findsNothing);
       expect(find.text('tkforgeworks.com'), findsNothing);
       expect(find.text('Delete your account'), findsNothing);
       expect(find.text('Open-source licenses'), findsNothing);
