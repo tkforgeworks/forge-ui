@@ -315,6 +315,7 @@ ForgeAboutScreen(
   badge: const AppBadge(size: 64),
   blurb: 'One paragraph in the app\'s voice.',
   footnote: 'Nothing here leaves this device.',
+  onSendFeedback: openFeedbackScreen,     // the app's own screen
   onOpenWebsite: openSite,
   onOpenPrivacyPolicy: openPrivacyPolicy, // required
   onOpenDeleteAccount: openDeletionPage,  // null in an app with no accounts
