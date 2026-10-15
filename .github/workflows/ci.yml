@@ -1,6 +1,7 @@
 # Consumes the org standard Flutter CI (tkforgeworks/.github). Runs
 # `flutter pub get`, `dart format --set-exit-if-changed`, `flutter analyze`,
-# `flutter test`.
+# `flutter test`: once for the package, and once for the showcase app under
+# example/, whose tests are the golden images.
 #
 # Trigger envelope per tkforgeworks/.github docs/ci-standards.md: pushes to any
 # branch but main get feedback while iterating; PRs into main or a release
@@ -26,3 +27,11 @@ jobs:
     uses: tkforgeworks/.github/.github/workflows/ci-flutter.yml@main
     with:
       flutter-version: '3.47.5'
+
+  # Not a required check: the merge gate is "ci / ci". This one is named
+  # "showcase / ci".
+  showcase:
+    uses: tkforgeworks/.github/.github/workflows/ci-flutter.yml@main
+    with:
+      flutter-version: '3.47.5'
+      working-directory: example
