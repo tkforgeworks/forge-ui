@@ -9,8 +9,10 @@ it as a git dependency pinned to a release tag and supply only their seed
 color, icon and domain screens. Its sibling `forge-core` (separate repo) owns
 sign-in, account and data plumbing. Current phase: the cheese app
 (`tkforgeworks/cheesy-scribe`, its first consumer and the reference for what
-v0.1 contains) adopted it and ships it in its `v0.2.0` release candidates;
-fixes and additions it needs land here as further `v0.1.0` RCs.
+v0.1 contains) adopted it in its `v0.2.0` release candidates and pins the
+first stable release, `v0.1.0` (2026-10-14). No next release branch is cut
+yet: fixes go on a `v0.1.1/main`, new work (the sign-in screen) on
+`v0.2.0/main`, each cut from `main` when it starts.
 
 Spec: `docs/forge-ui_forge-core_Shared_Flutter_Packages_Spec.md`. The same
 file lives in `forge-core/docs/`; the two copies must stay identical, so any
@@ -49,8 +51,9 @@ means updating the gallery section, its golden and that README together.
 
 - Branching (org standard, `tkforgeworks/.github/docs/branching-and-release.md`):
   `main` is the released state; work accumulates on the current release branch
-  `vX.Y.Z/main` (currently `v0.1.0/main`; `v0.0.1/main` was the repo-setup
-  batch and is merged); topic branches
+  `vX.Y.Z/main` (none open: `v0.1.0/main` shipped as `v0.1.0` on
+  2026-10-14, and `v0.0.1/main` was the repo-setup batch, merged); topic
+  branches
   PR **into the release branch**, never into `main`; the release branch reaches
   `main` via a release PR.
 - `main` is protected by the org repository ruleset: PR-only, no force-push or
@@ -143,23 +146,23 @@ of the org Flutter pipeline with both builds off: it produced the tag and a
 prerelease with notes and no files. A scratch app pinning `ref: v0.1.0-rc.1`
 resolved it from GitHub and ran a widget test against it.
 
+The cheese app adopted it under CHEESE-48 (2026-10-13) and moved through
+`v0.1.0-rc.2` (SDK floor lowered so its Flutter 3.47.2 CI resolves the
+package) and `v0.1.0-rc.3` (`ForgeAboutScreen.onSendFeedback`, CHEESE-51).
+Tim's device passes on its `v0.2.0` RCs found it matching, so `v0.1.0` was
+finalised on 2026-10-14 from the rc.3 code (`bump-version.sh final`, release
+PR `v0.1.0/main` → `main`) and the cheese app re-pinned to `ref: v0.1.0`.
+
 ## Next actions
 
 `main` is PR-only, so every change, including edits to this file and the
-spec, goes through a topic branch and a PR into `v0.1.0/main`.
+spec, goes through a topic branch and a PR into a release branch. None is
+open now: cut one from `main` first.
 
-1. The cheese app adopted `v0.1.0-rc.1` under **CHEESE-48** (2026-10-13) and
-   re-pinned to `v0.1.0-rc.2`, which lowered the SDK floor so its CI could
-   resolve the package. Its `v0.2.0-rc.1` ships rc.2, and Tim's device pass
-   found it matches the pre-adoption look.
-2. **CHEESE-51** (2026-10-14): `ForgeAboutScreen.onSendFeedback` adds a
-   "Send feedback" row (in-app chevron, first in the card) that opens the
-   app's own feedback screen. The form itself stays in the cheese app until
-   a second app needs it. Release it as `v0.1.0-rc.3` for the app to pin.
-3. When the cheese app is happy: `bump-version.sh final` and the release PR
-   `v0.1.0/main` → `main`, which publishes `v0.1.0`. The cheese app moves to
-   that tag before its own 0.2.0 final.
-4. forge-ui v0.2: the sign-in screen, alongside forge-core v0.1.
+1. forge-ui v0.2: the sign-in screen, alongside forge-core v0.1, on
+   `v0.2.0/main`.
+2. Delete `v0.1.0/main` now that `v0.1.0` is tagged (see the
+   `v0.0.1/main` item below: same ruleset step, Tim's explicit yes).
 
 ## Open items
 
