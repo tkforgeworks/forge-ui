@@ -537,14 +537,14 @@ class _GalleryScreenState extends State<GalleryScreen> {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => _confirm(destructive: true),
-                        child: const Text('Destructive'),
+                        child: const Text('Delete'),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => _confirm(destructive: false),
-                        child: const Text('Plain'),
+                        child: const Text('Sign out'),
                       ),
                     ),
                     const SizedBox(width: 12),
