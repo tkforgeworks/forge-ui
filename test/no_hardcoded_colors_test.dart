@@ -6,11 +6,16 @@ import 'package:flutter_test/flutter_test.dart';
 /// colour comes from the colour scheme or `ForgeTokens`, or theme swapping
 /// breaks for every app.
 ///
-/// Two files may hold literals: `forge_brand.dart` (the brand's own colours)
-/// and `forge_tokens.dart` (the success pair a seed can't produce).
-/// `Colors.transparent` is allowed anywhere, since it paints nothing.
+/// Three files may hold literals: `forge_brand.dart` (the brand's own
+/// colours), `forge_tokens.dart` (the success pair a seed can't produce) and
+/// `forge_provider_brand.dart` (the colours Google mandates for its sign-in
+/// button). `Colors.transparent` is allowed anywhere, since it paints nothing.
 void main() {
-  const allowed = {'forge_brand.dart', 'forge_tokens.dart'};
+  const allowed = {
+    'forge_brand.dart',
+    'forge_tokens.dart',
+    'forge_provider_brand.dart',
+  };
   final literal = RegExp(
     r'\bColor(\.from[A-Z]+)?\(|\bColors\.(?!transparent\b)',
   );

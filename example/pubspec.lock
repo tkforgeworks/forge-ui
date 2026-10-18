@@ -89,7 +89,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.1.0-rc.2+3"
+    version: "0.1.0+5"
   heroicons:
     dependency: "direct main"
     description:

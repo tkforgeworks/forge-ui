@@ -94,6 +94,26 @@ TextButton(onPressed: forgot, child: const Text('Forgot password?'));
   <img src="test/goldens/components/buttons_dark.png" width="400" alt="Buttons, dark">
 </p>
 
+## Sign-in buttons
+
+`ForgeSignInButton` draws "Continue with …" for a provider. Google's follows
+Google's branding guidelines exactly (their colours from `ForgeProviderBrand`,
+their official "G", Google Sans Medium, 40 high, pill): light or dark follows
+the theme, or pass `theme: ForgeProviderButtonTheme.neutral`. The email
+button is an ordinary outlined button. `busy` swaps the logo for a progress
+ring and disables the button. Apple is reserved for the first iOS app.
+
+```dart
+ForgeSignInButton(provider: ForgeSignInProvider.google, onPressed: signInWithGoogle);
+ForgeSignInButton(provider: ForgeSignInProvider.google, busy: true, onPressed: () {});
+ForgeSignInButton(provider: ForgeSignInProvider.email, onPressed: showEmailForm);
+```
+
+<p>
+  <img src="test/goldens/components/sign_in_light.png" width="400" alt="Sign-in buttons, light">
+  <img src="test/goldens/components/sign_in_dark.png" width="400" alt="Sign-in buttons, dark">
+</p>
+
 ## Fields
 
 `ForgeBoxedField` is the theme's outlined text field with its mono label

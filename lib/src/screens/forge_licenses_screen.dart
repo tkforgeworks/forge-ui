@@ -31,7 +31,7 @@ class ForgeLicensesScreen extends StatelessWidget {
 
   /// The "Fonts" row. The same in every app, since the fonts are the brand's.
   static const fontsLine =
-      'Poppins, Source Serif 4 and JetBrains Mono: '
+      'Poppins, Source Serif 4, JetBrains Mono and Google Sans Flex: '
       'SIL Open Font License 1.1';
 
   final String appName;

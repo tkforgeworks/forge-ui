@@ -276,6 +276,35 @@ class _GalleryScreenState extends State<GalleryScreen> {
               ],
             ),
           ),
+          _Section(
+            'Sign in',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ForgeSignInButton(
+                  provider: ForgeSignInProvider.google,
+                  onPressed: () => _say('Google.'),
+                ),
+                const SizedBox(height: 12),
+                ForgeSignInButton(
+                  provider: ForgeSignInProvider.google,
+                  theme: ForgeProviderButtonTheme.neutral,
+                  onPressed: () => _say('Google, neutral.'),
+                ),
+                const SizedBox(height: 12),
+                ForgeSignInButton(
+                  provider: ForgeSignInProvider.google,
+                  busy: true,
+                  onPressed: () {},
+                ),
+                const SizedBox(height: 12),
+                ForgeSignInButton(
+                  provider: ForgeSignInProvider.email,
+                  onPressed: () => _say('Email.'),
+                ),
+              ],
+            ),
+          ),
           const _Section(
             'Fields',
             child: Column(
@@ -486,6 +515,7 @@ const gallerySections = [
   'Brand',
   'Type',
   'Buttons',
+  'Sign in',
   'Fields',
   'Selection',
   'Main action',

@@ -24,6 +24,7 @@ const forgeFontLicenses = [
   ('Poppins', 'Poppins-OFL.txt'),
   ('Source Serif 4', 'SourceSerif4-OFL.md'),
   ('JetBrains Mono', 'JetBrainsMono-OFL.txt'),
+  ('Google Sans Flex', 'GoogleSansFlex-OFL.txt'),
 ];
 
 /// In an app the texts are a dependency's assets (`packages/forge_ui/...`);
