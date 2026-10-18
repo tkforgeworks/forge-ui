@@ -147,6 +147,36 @@ ForgeSignInPanel(
   <img src="test/goldens/sign_in_violet_dark.png" width="300" alt="Sign-in screen, dark">
 </p>
 
+## Email screens
+
+`ForgeCheckEmailScreen` is the waiting state after a sign-up
+(`ForgeEmailPurpose.confirm`) or a reset request (`ForgeEmailPurpose.reset`):
+the address the mail went to, "Send again" on a cooldown that starts the
+moment the screen opens, "Use a different address" and Done.
+`ForgeSetPasswordScreen` is the form the app shows when it opens from a
+reset link (or for "Set a password" on a Google-only account): two fields
+that must match and reach eight characters. Both take `busy` and
+`errorText` from the app.
+
+```dart
+ForgeCheckEmailScreen(
+  email: email,
+  purpose: ForgeEmailPurpose.confirm,
+  onResend: () => auth.resendConfirmation(email),
+  onChangeEmail: () => context.pop(),
+  onDone: () => context.go('/account'),
+);
+
+ForgeSetPasswordScreen(onSubmit: auth.updatePassword, busy: saving);
+```
+
+<p>
+  <img src="test/goldens/check_email_violet_light.png" width="300" alt="Check your email, light">
+  <img src="test/goldens/check_email_violet_dark.png" width="300" alt="Check your email, dark">
+  <img src="test/goldens/set_password_violet_light.png" width="300" alt="New password, light">
+  <img src="test/goldens/set_password_violet_dark.png" width="300" alt="New password, dark">
+</p>
+
 ## Fields
 
 `ForgeBoxedField` is the theme's outlined text field with its mono label

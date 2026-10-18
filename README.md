@@ -73,6 +73,7 @@ forgeTheme(
 | `ForgeFab` | The one gradient button |
 | `ForgeSignInButton`, `ForgeSignInProvider`, `ForgeLinkedSignIn`, `ForgeProviderBrand` | Provider sign-in buttons (Google to Google's branding rules) and the plain types the account page uses |
 | `ForgeSignInPanel`, `ForgeSignInScreen` | The sign-in surface: provider buttons plus the email form (sign in, create, forgot), embeddable or as a screen |
+| `ForgeCheckEmailScreen`, `ForgeSetPasswordScreen` | The email flow's waiting state (with resend cooldown) and the new-password form |
 | `ForgeWorksMark` | The hammer-and-anvil maker mark |
 | `ForgeAboutScreen`, `ForgeLicensesScreen` | About and licences screens; links are callbacks |
 
