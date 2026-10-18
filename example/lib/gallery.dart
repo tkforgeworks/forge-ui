@@ -356,6 +356,33 @@ class _GalleryScreenState extends State<GalleryScreen> {
               onForgotPassword: (email) => _say('Reset for $email.'),
             ),
           ),
+          _Section(
+            'Account settings',
+            child: ForgeAccountSettings(
+              email: 'tim@example.com',
+              username: 'Tim',
+              onUsernameChanged: (v) => _say('Username → $v'),
+              linked: const [
+                ForgeLinkedSignIn(
+                  provider: ForgeSignInProvider.email,
+                  email: 'tim@example.com',
+                ),
+              ],
+              onLink: (p) => _say('Link ${p.label}.'),
+              onSetPassword: () => _say('Set a password.'),
+              status: const ListTile(
+                title: Text('Backed up'),
+                subtitle: Text('Last synced a minute ago'),
+                trailing: ForgeStatusCapsule('Up to date', active: true),
+              ),
+              onSignOut: ({required eraseLocal}) async =>
+                  _say(eraseLocal ? 'Signed out and erased.' : 'Signed out.'),
+              onDeleteAccount: () async {
+                await Future<void>.delayed(const Duration(seconds: 1));
+                return null;
+              },
+            ),
+          ),
           const _Section(
             'Fields',
             child: Column(
@@ -621,6 +648,7 @@ const gallerySections = [
   'Buttons',
   'Sign in',
   'Sign-in panel',
+  'Account settings',
   'Fields',
   'Selection',
   'Main action',

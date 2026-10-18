@@ -147,6 +147,38 @@ ForgeSignInPanel(
   <img src="test/goldens/sign_in_violet_dark.png" width="300" alt="Sign-in screen, dark">
 </p>
 
+## Account settings
+
+`ForgeAccountSettings` is the shared account page body. Signed out (`email`
+null) it shows `signedOut`, usually a `ForgeSignInPanel`. Signed in: the
+email, a username field saved on Done or blur, the linked sign-in methods
+with "Link Google" / "Set a password" rows when they apply, a slot for the
+app's backup status, then Sign out and Delete account. The two destructive
+rows open the shared sheets themselves: `onSignOut` gets the "Also erase
+this phone" choice from `showForgeSignOutSheet`, and `onDeleteAccount` runs
+inside the typed confirmation sheet (return null on success, a message to
+keep it open). The app's own profile header goes above the widget.
+
+```dart
+ForgeAccountSettings(
+  email: session.email,
+  username: account?.username,
+  onUsernameChanged: accounts.setUsername,
+  linked: [for (final i in session.identities) ForgeLinkedSignIn(provider: map(i.provider), email: i.email)],
+  onLink: (_) => auth.linkGoogle(),
+  onSetPassword: () => context.push('/account/set-password'),
+  status: BackupStatusRow(),
+  onSignOut: ({required eraseLocal}) => signOut(eraseLocal),
+  onDeleteAccount: () async => (await accounts.deleteAccount()) is ForgeFailed ? "Couldn't reach the server." : null,
+  signedOut: ForgeSignInPanel(/* … */),
+);
+```
+
+<p>
+  <img src="test/goldens/components/account_settings_light.png" width="400" alt="Account settings, light">
+  <img src="test/goldens/components/account_settings_dark.png" width="400" alt="Account settings, dark">
+</p>
+
 ## Email screens
 
 `ForgeCheckEmailScreen` is the waiting state after a sign-up
