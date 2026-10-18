@@ -217,7 +217,21 @@ Done; keys `resendKey`, `changeEmailKey`, `doneKey`) and
 `ForgeSetPasswordScreen` (two matching fields ≥ 8, show/hide, busy; keys
 `passwordFieldKey`, `confirmFieldKey`, `submitKey`, `showPasswordKey`);
 "Email screens" gallery entry, screen goldens, README. Shipped as
-`v0.2.0-rc.3`.
+`v0.2.0-rc.3`. FU-5 (typed / async confirm sheet) shipped as `v0.2.0-rc.4`.
+
+2026-10-18: FU-6: `ForgeAccountSettings` (signed-out → `signedOut` widget;
+signed-in → Account group with email and a username field saved once on
+Done or blur, Sign-in methods group with linked rows plus "Link Google" /
+"Set a password" when they apply, the app's `status` slot under
+`statusLabel`, Sign out and Delete account rows that open the shared
+sheets themselves: `onSignOut({eraseLocal})` after `showForgeSignOutSheet`,
+`onDeleteAccount` as the typed sheet's `onConfirmAsync`) and
+`showForgeSignOutSheet` / `ForgeSignOutSheet` with the "Also erase this
+phone" checkbox (`ForgeSignOutChoice`). Keys `usernameFieldKey`,
+`linkGoogleKey`, `setPasswordKey`, `signOutKey`, `deleteKey`,
+`ForgeSignOutSheet.eraseKey/confirmKey/cancelKey`. With it the v0.2 scope
+is complete; `v0.2.0` goes final when cheesy-scribe 0.3.0 has adopted the
+RCs on a device (CHEESE-67).
 
 2026-10-18: FU-5: `showForgeConfirmSheet` gained `typeToConfirm` (+
 `caseSensitive`) and `onConfirmAsync` (`Future<String?>`: null closes with
@@ -234,7 +248,8 @@ through a topic branch and a PR into `v0.2.0/main`.
 1. forge-ui v0.2 as FU tickets: FU-2 (done) `ForgeProviderBrand` + Google
    Sans Flex + the "G" asset and `ForgeSignInButton`; FU-3 (done)
    `ForgeSignInPanel` / `ForgeSignInScreen`; FU-4 (done) the two email
-   screens; FU-5 (done) the typed / async confirm sheet;
+   screens; FU-5 (done) the typed / async confirm sheet; FU-6 (done)
+   `ForgeAccountSettings` + `ForgeSignOutSheet`;
    FU-5 `showForgeConfirmSheet(typeToConfirm:)` and busy states; FU-6
    `ForgeAccountSettings` and `ForgeSignOutSheet`; showcase gallery, goldens
    and `example/README.md` for each. Cut RCs as pieces land; cheesy-scribe
