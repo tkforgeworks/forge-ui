@@ -209,7 +209,14 @@ busy) and `ForgeSignInScreen` (app bar, optional "Not now"); "Sign-in
 panel" gallery section, sign-in screen goldens, README. Keys on the panel
 (`emailFieldKey`, `passwordFieldKey`, `submitKey`, `switchModeKey`,
 `forgotKey`, `showPasswordKey`) and `ForgeSignInScreen.skipKey` are what
-app tests drive.
+app tests drive. Shipped as `v0.2.0-rc.2`.
+
+2026-10-18: FU-4: `ForgeCheckEmailScreen` (confirm / reset wording, "Send
+again" on a cooldown that starts when the screen opens, change-address and
+Done; keys `resendKey`, `changeEmailKey`, `doneKey`) and
+`ForgeSetPasswordScreen` (two matching fields ≥ 8, show/hide, busy; keys
+`passwordFieldKey`, `confirmFieldKey`, `submitKey`, `showPasswordKey`);
+"Email screens" gallery entry, screen goldens, README.
 
 ## Next actions
 
@@ -218,7 +225,8 @@ through a topic branch and a PR into `v0.2.0/main`.
 
 1. forge-ui v0.2 as FU tickets: FU-2 (done) `ForgeProviderBrand` + Google
    Sans Flex + the "G" asset and `ForgeSignInButton`; FU-3 (done)
-   `ForgeSignInPanel` / `ForgeSignInScreen`; FU-4 the two email screens;
+   `ForgeSignInPanel` / `ForgeSignInScreen`; FU-4 (done) the two email
+   screens;
    FU-5 `showForgeConfirmSheet(typeToConfirm:)` and busy states; FU-6
    `ForgeAccountSettings` and `ForgeSignOutSheet`; showcase gallery, goldens
    and `example/README.md` for each. Cut RCs as pieces land; cheesy-scribe

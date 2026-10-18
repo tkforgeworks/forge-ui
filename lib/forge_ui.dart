@@ -8,7 +8,9 @@ library;
 
 export 'src/font_licenses.dart' show registerForgeFontLicenses;
 export 'src/screens/forge_about_screen.dart';
+export 'src/screens/forge_check_email_screen.dart';
 export 'src/screens/forge_licenses_screen.dart';
+export 'src/screens/forge_set_password_screen.dart';
 export 'src/screens/forge_sign_in_screen.dart';
 export 'src/theme/forge_brand.dart';
 export 'src/theme/forge_provider_brand.dart';

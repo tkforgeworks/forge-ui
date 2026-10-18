@@ -80,6 +80,18 @@ class _GalleryScreenState extends State<GalleryScreen> {
     onSkip: () => Navigator.of(context).pop(),
   );
 
+  Widget _checkEmail() => ForgeCheckEmailScreen(
+    email: 'tim@example.com',
+    purpose: ForgeEmailPurpose.confirm,
+    onResend: () => _say('Sent again.'),
+    onChangeEmail: () => Navigator.of(context).pop(),
+    onDone: () => Navigator.of(context).pop(),
+  );
+
+  Widget _setPassword() => ForgeSetPasswordScreen(
+    onSubmit: (password) => _say('Saved ${password.length} characters.'),
+  );
+
   Widget _licenses() => ForgeLicensesScreen(
     appName: 'Showcase',
     licenseName: 'Apache License 2.0',
@@ -530,6 +542,26 @@ class _GalleryScreenState extends State<GalleryScreen> {
               ],
             ),
           ),
+          _Section(
+            'Email screens',
+            child: Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => _open(_checkEmail()),
+                    child: const Text('Check email'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => _open(_setPassword()),
+                    child: const Text('New password'),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -555,6 +587,7 @@ const gallerySections = [
   'Loading',
   'Confirm sheet',
   'Screens',
+  'Email screens',
 ];
 
 /// The key on a section's repaint boundary, for tests that photograph it.
