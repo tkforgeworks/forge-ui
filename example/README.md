@@ -114,6 +114,39 @@ ForgeSignInButton(provider: ForgeSignInProvider.email, onPressed: showEmailForm)
   <img src="test/goldens/components/sign_in_dark.png" width="400" alt="Sign-in buttons, dark">
 </p>
 
+## Sign-in panel and screen
+
+`ForgeSignInPanel` is the whole sign-in surface: the provider buttons above
+an always-present email form that switches between **sign in**, **create an
+account** and **forgot password**. Callbacks in, no auth logic: the app runs
+the request and drives `busy` and `errorText` from the result. The panel
+validates the address and (on create) an 8-character minimum itself, with
+field-level errors on submit. A null `onGoogle` / `onApple` hides that
+button; at least one is required. Embed it in your own screen, or use
+`ForgeSignInScreen`, which adds the app bar and an optional "Not now".
+
+```dart
+ForgeSignInPanel(
+  heading: 'Back up your notes',
+  blurb: 'Sign in and they follow you to your next phone.',
+  onGoogle: signInWithGoogle,
+  onEmailSignIn: (email, password) => auth.signInWithEmail(email, password),
+  onEmailCreate: (email, password) => auth.signUpWithEmail(email, password),
+  onForgotPassword: auth.sendPasswordReset,
+  busy: state.isBusy,
+  errorText: state.error,
+);
+```
+
+<p>
+  <img src="test/goldens/components/sign_in_panel_light.png" width="400" alt="Sign-in panel, light">
+  <img src="test/goldens/components/sign_in_panel_dark.png" width="400" alt="Sign-in panel, dark">
+</p>
+<p>
+  <img src="test/goldens/sign_in_violet_light.png" width="300" alt="Sign-in screen, light">
+  <img src="test/goldens/sign_in_violet_dark.png" width="300" alt="Sign-in screen, dark">
+</p>
+
 ## Fields
 
 `ForgeBoxedField` is the theme's outlined text field with its mono label

@@ -13,7 +13,7 @@ import 'package:forge_ui_showcase/showcase_app.dart';
 /// `flutter test --update-goldens` and look at the images before committing.
 void main() {
   // A phone-width page tall enough to hold the whole gallery.
-  const gallerySize = Size(412, 3500);
+  const gallerySize = Size(412, 4000);
   const screenSize = Size(412, 900);
 
   String slug(String name) =>
@@ -144,6 +144,22 @@ void main() {
             onOpenPrivacyPolicy: () {},
             onOpenDeleteAccount: () {},
             onOpenLicenses: () {},
+          ),
+        );
+      });
+
+      goldenTest('sign-in: ${sample.name}, ${brightness.name}', (tester) async {
+        await shoot(
+          tester,
+          'sign_in',
+          ForgeSignInScreen(
+            heading: 'Back up your notes',
+            blurb: 'Sign in and they follow you to your next phone.',
+            onGoogle: () {},
+            onEmailSignIn: (_, _) {},
+            onEmailCreate: (_, _) {},
+            onForgotPassword: (_) {},
+            onSkip: () {},
           ),
         );
       });

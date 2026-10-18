@@ -70,6 +70,16 @@ class _GalleryScreenState extends State<GalleryScreen> {
     onOpenLicenses: () => _open(_licenses()),
   );
 
+  Widget _signIn() => ForgeSignInScreen(
+    heading: 'Back up your notes',
+    blurb: 'Sign in and they follow you to your next phone.',
+    onGoogle: () => _say('Google.'),
+    onEmailSignIn: (email, _) => _say('Sign in as $email.'),
+    onEmailCreate: (email, _) => _say('Create $email.'),
+    onForgotPassword: (email) => _say('Reset for $email.'),
+    onSkip: () => Navigator.of(context).pop(),
+  );
+
   Widget _licenses() => ForgeLicensesScreen(
     appName: 'Showcase',
     licenseName: 'Apache License 2.0',
@@ -305,6 +315,17 @@ class _GalleryScreenState extends State<GalleryScreen> {
               ],
             ),
           ),
+          _Section(
+            'Sign-in panel',
+            child: ForgeSignInPanel(
+              heading: 'Back up your notes',
+              blurb: 'Sign in and they follow you to your next phone.',
+              onGoogle: () => _say('Google.'),
+              onEmailSignIn: (email, _) => _say('Sign in as $email.'),
+              onEmailCreate: (email, _) => _say('Create $email.'),
+              onForgotPassword: (email) => _say('Reset for $email.'),
+            ),
+          ),
           const _Section(
             'Fields',
             child: Column(
@@ -499,6 +520,13 @@ class _GalleryScreenState extends State<GalleryScreen> {
                     child: const Text('Licences'),
                   ),
                 ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => _open(_signIn()),
+                    child: const Text('Sign in'),
+                  ),
+                ),
               ],
             ),
           ),
@@ -516,6 +544,7 @@ const gallerySections = [
   'Type',
   'Buttons',
   'Sign in',
+  'Sign-in panel',
   'Fields',
   'Selection',
   'Main action',
