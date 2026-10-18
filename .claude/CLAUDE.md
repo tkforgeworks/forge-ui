@@ -200,7 +200,16 @@ sign-in, deletion in the first forge-core release, shared-first screens).
 outlined; Apple asserts), `ForgeSignInProvider` and `ForgeLinkedSignIn`;
 "Sign in" gallery section, goldens and README; `ticket-prefix: FU` on the
 release workflow. The licences screen's `fontsLine` now names four fonts
-(cheesy-scribe's renders of that screen change when it re-pins).
+(cheesy-scribe's renders of that screen change when it re-pins). Shipped as
+`v0.2.0-rc.1`.
+
+2026-10-18: FU-3: `ForgeSignInPanel` (provider buttons over the email form
+with sign in / create / forgot modes, own validation, field + form errors,
+busy) and `ForgeSignInScreen` (app bar, optional "Not now"); "Sign-in
+panel" gallery section, sign-in screen goldens, README. Keys on the panel
+(`emailFieldKey`, `passwordFieldKey`, `submitKey`, `switchModeKey`,
+`forgotKey`, `showPasswordKey`) and `ForgeSignInScreen.skipKey` are what
+app tests drive.
 
 ## Next actions
 
@@ -208,8 +217,8 @@ release workflow. The licences screen's `fontsLine` now names four fonts
 through a topic branch and a PR into `v0.2.0/main`.
 
 1. forge-ui v0.2 as FU tickets: FU-2 (done) `ForgeProviderBrand` + Google
-   Sans Flex + the "G" asset and `ForgeSignInButton`; FU-3 `ForgeSignInPanel`
-   / `ForgeSignInScreen` with the email form; FU-4 the two email screens;
+   Sans Flex + the "G" asset and `ForgeSignInButton`; FU-3 (done)
+   `ForgeSignInPanel` / `ForgeSignInScreen`; FU-4 the two email screens;
    FU-5 `showForgeConfirmSheet(typeToConfirm:)` and busy states; FU-6
    `ForgeAccountSettings` and `ForgeSignOutSheet`; showcase gallery, goldens
    and `example/README.md` for each. Cut RCs as pieces land; cheesy-scribe
