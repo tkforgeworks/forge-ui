@@ -5,13 +5,4 @@ last_checked:
   org_commit: be3ad498ac80e7283a56691aadd24c1ea1eeb890
   date: 2026-10-10
 
-deviations:
-  - standard: branching-and-release
-    item: no Jira key in branch names or commit subjects
-    kind: parameter
-    reason: >
-      No Jira project exists for forge-ui yet, so topic branches are
-      vX.Y.Z/<short-topic> and commit subjects carry no <KEY>-N prefix. Open
-      item: create the project, then switch to vX.Y.Z/<KEY>-N-topic and remove
-      this entry.
-    since: 2026-10-10
+deviations: []
