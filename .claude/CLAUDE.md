@@ -42,7 +42,8 @@ patch at `pub get` (cheesy-scribe's CI, on Flutter 3.47.2, could not resolve
 
 Layout: `lib/forge_ui.dart` is the only public library and exports everything
 under `lib/src/` (`theme/`, `widgets/`, `screens/`). Fonts and their OFL texts
-are in `assets/fonts/`. `example/` is the showcase app; its tests are golden
+are in `assets/fonts/`; provider logos (Google's "G", 1x–4x) in
+`assets/brand/providers/`, all rights reserved by their owners (NOTICE). `example/` is the showcase app; its tests are golden
 images under `example/test/goldens/` and run as the `showcase / ci` job. Read
 the golden PNGs to see the current look without running anything.
 `example/README.md` is the component catalogue: it embeds those same PNGs
@@ -83,8 +84,9 @@ means updating the gallery section, its golden and that README together.
   publishes `vX.Y.Z`. **Never hand-edit the version or push tags**; the
   workflow creates the tag. `pubspec.yaml` holds the upcoming version as
   `X.Y.Z[-rc.N]+BUILD` (the build number means nothing for a package but the
-  bump script requires it). No `ticket-prefix`, so release notes are the
-  commit subjects. The bump scripts are vendored copies of the org ones
+  bump script requires it). `ticket-prefix: FU` and the repo variable
+  `JIRA_BASE_URL` (both FU-2) make release notes link each `FU-N:` subject.
+  The bump scripts are vendored copies of the org ones
   (`tkforgeworks/.github` @ `a800dd1`); don't edit them here.
 - Apps consume a release as a git dependency pinned to an **exact tag**
   (`ref: vX.Y.Z`). Bumping that line is the only way an app picks up a change.
@@ -132,9 +134,17 @@ means updating the gallery section, its golden and that README together.
   a Medium instance of **Google Sans Flex** (Google's OFL 1.1 rebuild of
   Google Sans, on Google Fonts since 2025-11) for the Google button label
   only, which Google's branding guidelines require; never bundle the
-  proprietary Google Sans. Verify the licence file before adding it; fall
-  back to Roboto Medium (Apache-2.0) if it fails. The Google "G" logo is
-  Google's official asset, all rights reserved, listed in `NOTICE`.
+  proprietary Google Sans. Done in FU-2: the OFL declares no Reserved Font
+  Names and Google's TRADEMARKS.md allows the name to identify the font;
+  `GoogleSansFlex-Medium.ttf` is a static instance (`fontTools
+  varLib.instancer wght=500`, other axes at default, `pyftsubset` to Latin;
+  recipe in `assets/fonts/LICENSES.md`). The Google "G" is cropped from
+  Google's pre-approved button PNGs (the 2026 bundle's SVGs use filters and
+  `foreignObject` gradients Flutter can't render), background lifted to
+  alpha, shipped at 1x–4x; all rights reserved by Google, listed in
+  `NOTICE`. `ForgeSignInButton` loads it with an `errorBuilder` because this
+  package's own widget tests have no `packages/forge_ui/` prefix; the
+  showcase goldens are where it is really rendered.
 - Icons are Heroicons outline, through the `heroicons` package (MIT).
 - Release scope: v0.1 is theme, tokens, base components and the about and
   licences screens (shipped). **v0.2 ships the sign-in panel/screen and the
@@ -185,18 +195,26 @@ replaced the spec copy with a pointer to forge-core's canonical spec, which
 FC-1 revised the same day for cheesy-scribe 0.3.0 (Google and email/password
 sign-in, deletion in the first forge-core release, shared-first screens).
 
+2026-10-18: FU-2: `ForgeProviderBrand`, Google Sans Flex Medium, the Google
+"G" asset, `ForgeSignInButton` (Google light/dark/neutral, busy; email
+outlined; Apple asserts), `ForgeSignInProvider` and `ForgeLinkedSignIn`;
+"Sign in" gallery section, goldens and README; `ticket-prefix: FU` on the
+release workflow. The licences screen's `fontsLine` now names four fonts
+(cheesy-scribe's renders of that screen change when it re-pins).
+
 ## Next actions
 
 `main` is PR-only, so every change, including edits to this file, goes
 through a topic branch and a PR into `v0.2.0/main`.
 
-1. forge-ui v0.2 as FU tickets, roughly: `ForgeProviderBrand` + Google Sans
-   Flex + the "G" asset and `ForgeSignInButton`; `ForgeSignInPanel` /
-   `ForgeSignInScreen` and the two email screens; `showForgeConfirmSheet(
-   typeToConfirm:)` and busy states; `ForgeAccountSettings` and
-   `ForgeSignOutSheet`; showcase gallery, goldens and `example/README.md`
-   for each. Cut RCs as pieces land; cheesy-scribe `v0.3.0/main` consumes
-   them against forge-core's RCs.
+1. forge-ui v0.2 as FU tickets: FU-2 (done) `ForgeProviderBrand` + Google
+   Sans Flex + the "G" asset and `ForgeSignInButton`; FU-3 `ForgeSignInPanel`
+   / `ForgeSignInScreen` with the email form; FU-4 the two email screens;
+   FU-5 `showForgeConfirmSheet(typeToConfirm:)` and busy states; FU-6
+   `ForgeAccountSettings` and `ForgeSignOutSheet`; showcase gallery, goldens
+   and `example/README.md` for each. Cut RCs as pieces land; cheesy-scribe
+   `v0.3.0/main` consumes them against forge-core's RCs (forge-core
+   `v0.1.0-rc.1` exists since 2026-10-18).
 2. Keep the callback shapes aligned with forge-core's real API as it lands
    (the spec's `ForgeAccountSettings` sketch is the contract).
 
