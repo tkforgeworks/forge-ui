@@ -49,6 +49,24 @@ class _GalleryScreenState extends State<GalleryScreen> {
     if (mounted) _say(confirmed ? 'Confirmed.' : 'Cancelled.');
   }
 
+  /// The typed variant, running a pretend deletion that fails once.
+  var _typedAttempts = 0;
+  Future<void> _confirmTyped() async {
+    final confirmed = await showForgeConfirmSheet(
+      context,
+      title: 'Delete your account?',
+      aside: 'Your notes stay on this phone unless you erase them too.',
+      confirmLabel: 'Delete account',
+      typeToConfirm: 'DELETE',
+      onConfirmAsync: () async {
+        await Future<void>.delayed(const Duration(seconds: 1));
+        _typedAttempts++;
+        return _typedAttempts.isOdd ? "Couldn't reach the server." : null;
+      },
+    );
+    if (mounted) _say(confirmed ? 'Deleted.' : 'Kept.');
+  }
+
   void _open(Widget screen) {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => screen));
   }
@@ -495,19 +513,45 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
+                Material(
+                  color: c.surfaceContainerLowest,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(ForgeRadii.fab),
+                    side: BorderSide(color: c.outline),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: IgnorePointer(
+                    child: const ForgeConfirmSheet(
+                      title: 'Delete your account?',
+                      aside:
+                          'Your notes stay on this phone unless you erase '
+                          'them too.',
+                      confirmLabel: 'Delete account',
+                      typeToConfirm: 'DELETE',
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => _confirm(destructive: true),
-                        child: const Text('Open destructive'),
+                        child: const Text('Delete'),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => _confirm(destructive: false),
-                        child: const Text('Open plain'),
+                        child: const Text('Sign out'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: _confirmTyped,
+                        child: const Text('Typed'),
                       ),
                     ),
                   ],

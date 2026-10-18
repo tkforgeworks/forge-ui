@@ -366,6 +366,27 @@ if (confirmed) deleteAccount();
 The top card is the sheet's content; the buttons under it open the real
 sheet in the running app.
 
+The typed variant guards the irreversible: `typeToConfirm` keeps the
+destructive button disabled until the user types the word (case-insensitive
+unless `caseSensitive: true`), and `onConfirmAsync` runs the action inside
+the sheet, showing progress and refusing dismissal while it runs. Return
+`null` to close with `true`; return a message to keep the sheet open with
+that message under the field.
+
+```dart
+final deleted = await showForgeConfirmSheet(
+  context,
+  title: 'Delete your account?',
+  aside: 'Your notes stay on this phone unless you erase them too.',
+  confirmLabel: 'Delete account',
+  typeToConfirm: 'DELETE',
+  onConfirmAsync: () async {
+    final result = await core.accounts.deleteAccount();
+    return result is ForgeAuthFailure ? "Couldn't reach the server." : null;
+  },
+);
+```
+
 ## Brand marks
 
 The TK ForgeWorks mark in its brand colors, the same mark in one tint, a

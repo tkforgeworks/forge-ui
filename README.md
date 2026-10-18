@@ -67,7 +67,7 @@ forgeTheme(
 | `ForgeType`, `ForgeRadii`, `ForgeBrand` | Type helpers, corner radii, the forge gradient and mark colors |
 | `ForgeMonoLabel`, `ForgeTagCapsule`, `ForgeStatusCapsule` | Uppercase mono labels and capsules |
 | `ForgeBoxedField` | Outlined text field with its label outside |
-| `showForgeConfirmSheet` | Confirmation bottom sheet, destructive by default |
+| `showForgeConfirmSheet` | Confirmation bottom sheet, destructive by default; `typeToConfirm` and `onConfirmAsync` for the irreversible cases |
 | `ForgeEmptyState`, `ForgeErrorCard`, `ForgeSkeletonList` | Empty, error and loading states |
 | `ForgeSettingsGroup` | Labelled card of divider-separated rows |
 | `ForgeFab` | The one gradient button |

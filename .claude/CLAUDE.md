@@ -216,7 +216,15 @@ again" on a cooldown that starts when the screen opens, change-address and
 Done; keys `resendKey`, `changeEmailKey`, `doneKey`) and
 `ForgeSetPasswordScreen` (two matching fields ≥ 8, show/hide, busy; keys
 `passwordFieldKey`, `confirmFieldKey`, `submitKey`, `showPasswordKey`);
-"Email screens" gallery entry, screen goldens, README.
+"Email screens" gallery entry, screen goldens, README. Shipped as
+`v0.2.0-rc.3`.
+
+2026-10-18: FU-5: `showForgeConfirmSheet` gained `typeToConfirm` (+
+`caseSensitive`) and `onConfirmAsync` (`Future<String?>`: null closes with
+true, a message keeps the sheet open as an error under the field; progress
+in the confirm button, cancel disabled, `PopScope(canPop: false)` while
+busy). `ForgeConfirmSheet` is stateful now; keys `fieldKey`, `confirmKey`,
+`cancelKey`. Existing callers unchanged.
 
 ## Next actions
 
@@ -226,7 +234,7 @@ through a topic branch and a PR into `v0.2.0/main`.
 1. forge-ui v0.2 as FU tickets: FU-2 (done) `ForgeProviderBrand` + Google
    Sans Flex + the "G" asset and `ForgeSignInButton`; FU-3 (done)
    `ForgeSignInPanel` / `ForgeSignInScreen`; FU-4 (done) the two email
-   screens;
+   screens; FU-5 (done) the typed / async confirm sheet;
    FU-5 `showForgeConfirmSheet(typeToConfirm:)` and busy states; FU-6
    `ForgeAccountSettings` and `ForgeSignOutSheet`; showcase gallery, goldens
    and `example/README.md` for each. Cut RCs as pieces land; cheesy-scribe
