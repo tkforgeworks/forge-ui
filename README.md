@@ -71,6 +71,7 @@ forgeTheme(
 | `ForgeEmptyState`, `ForgeErrorCard`, `ForgeSkeletonList` | Empty, error and loading states |
 | `ForgeSettingsGroup` | Labelled card of divider-separated rows |
 | `ForgeFab` | The one gradient button |
+| `ForgeSignInButton`, `ForgeSignInProvider`, `ForgeLinkedSignIn`, `ForgeProviderBrand` | Provider sign-in buttons (Google to Google's branding rules) and the plain types the account page uses |
 | `ForgeWorksMark` | The hammer-and-anvil maker mark |
 | `ForgeAboutScreen`, `ForgeLicensesScreen` | About and licences screens; links are callbacks |
 

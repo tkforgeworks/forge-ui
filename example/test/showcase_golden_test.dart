@@ -13,7 +13,7 @@ import 'package:forge_ui_showcase/showcase_app.dart';
 /// `flutter test --update-goldens` and look at the images before committing.
 void main() {
   // A phone-width page tall enough to hold the whole gallery.
-  const gallerySize = Size(412, 3220);
+  const gallerySize = Size(412, 3500);
   const screenSize = Size(412, 900);
 
   String slug(String name) =>

@@ -26,6 +26,9 @@ flutter:
   # each app's licences page.
   assets:
     - assets/fonts/licenses/
+    # Google's official "G" for the sign-in button (1x plus 2.0x/3.0x/4.0x
+    # variants); all rights reserved by Google, see NOTICE.
+    - assets/brand/providers/
 
   # Bundled brand fonts (see assets/fonts/LICENSES.md): static instances so
   # FontWeight selects the face directly; no google_fonts runtime fetch.
@@ -58,4 +61,10 @@ flutter:
         - asset: assets/fonts/JetBrainsMono-Regular.ttf
           weight: 400
         - asset: assets/fonts/JetBrainsMono-Medium.ttf
+          weight: 500
+    # Only for the Google sign-in button label (ForgeProviderBrand): a static
+    # Medium instance of Google's OFL variable font, Latin subset.
+    - family: Google Sans Flex
+      fonts:
+        - asset: assets/fonts/GoogleSansFlex-Medium.ttf
           weight: 500
