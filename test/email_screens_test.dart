@@ -64,7 +64,8 @@ void main() {
         ),
       ),
     );
-    expect(find.text('Reset link sent'), findsOneWidget);
+    expect(find.text('Check your inbox'), findsOneWidget);
+    expect(find.textContaining('If there is an account for'), findsOneWidget);
     expect(find.byType(ForgeErrorCard), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     expect(find.byKey(ForgeCheckEmailScreen.changeEmailKey), findsNothing);

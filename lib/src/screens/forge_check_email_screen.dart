@@ -19,7 +19,10 @@ enum ForgeEmailPurpose {
 
 /// The waiting state after a sign-up or a reset request: which address the
 /// email went to, a "Send again" that stays disabled for [resendCooldown]
-/// after each send, a way back to change the address, and Done.
+/// after each send, a way back to change the address, and Done. The reset
+/// wording is conditional ("if there is an account for …"): Supabase
+/// reports success for an unknown address so the form cannot enumerate
+/// accounts, and the screen must not promise a mail that may never come.
 ///
 /// The screen opens the moment a mail was sent, so the cooldown starts at
 /// once. Callbacks in: [onResend] sends the mail again (the app drives
@@ -136,7 +139,7 @@ class _ForgeCheckEmailScreenState extends State<ForgeCheckEmailScreen> {
           ),
           const SizedBox(height: 18),
           Text(
-            confirm ? 'One more step' : 'Reset link sent',
+            confirm ? 'One more step' : 'Check your inbox',
             textAlign: TextAlign.center,
             style: ForgeType.ui(
               size: 22,
@@ -152,16 +155,20 @@ class _ForgeCheckEmailScreenState extends State<ForgeCheckEmailScreen> {
                 TextSpan(
                   text: confirm
                       ? 'We sent a confirmation link to '
-                      : 'We sent a link to set a new password to ',
+                      : 'If there is an account for ',
                 ),
                 TextSpan(
                   text: widget.email,
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
                 TextSpan(
+                  // Reset: Supabase answers success for unknown addresses
+                  // on purpose (no account enumeration), so the copy must
+                  // not promise a mail that may never come.
                   text: confirm
                       ? '. Open it on this phone and you are in.'
-                      : '. Open it on this phone to choose a new one.',
+                      : ', a link to set a new password is on its way. '
+                            'Open it on this phone to choose a new one.',
                 ),
               ],
             ),
