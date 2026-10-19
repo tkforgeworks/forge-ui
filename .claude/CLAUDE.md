@@ -10,13 +10,15 @@ color, icon and domain screens. Its sibling `forge-core` (separate repo) owns
 sign-in, account and data plumbing. Current phase: the cheese app
 (`tkforgeworks/cheesy-scribe`, its first consumer and the reference for what
 v0.1 contains) adopted it in its `v0.2.0` release candidates and pins the
-first stable release, `v0.1.0` (2026-10-14). No next release branch is cut
-yet: fixes go on a `v0.1.1/main`, new work (the sign-in screen) on
-`v0.2.0/main`, each cut from `main` when it starts.
+first stable release, `v0.1.0` (2026-10-14). `v0.2.0/main` was cut from
+`main` on 2026-10-17 (FU-1) for the v0.2 work: the sign-in and account
+screens cheesy-scribe 0.3.0 needs. A fix to `v0.1.0` would go on a
+`v0.1.1/main` cut from `main`.
 
-Spec: `docs/forge-ui_forge-core_Shared_Flutter_Packages_Spec.md`. The same
-file lives in `forge-core/docs/`; the two copies must stay identical, so any
-spec change lands in both repos together.
+**Spec: the canonical copy is in `tkforgeworks/forge-core`**,
+`docs/forge-ui_forge-core_Shared_Flutter_Packages_Spec.md` (decided
+2026-10-17). This repo's `docs/` file of the same name is a pointer to it,
+not a copy; spec changes land in forge-core only (its Jira project is `FC`).
 
 ## Stack & commands
 
@@ -40,7 +42,8 @@ patch at `pub get` (cheesy-scribe's CI, on Flutter 3.47.2, could not resolve
 
 Layout: `lib/forge_ui.dart` is the only public library and exports everything
 under `lib/src/` (`theme/`, `widgets/`, `screens/`). Fonts and their OFL texts
-are in `assets/fonts/`. `example/` is the showcase app; its tests are golden
+are in `assets/fonts/`; provider logos (Google's "G", 1x–4x) in
+`assets/brand/providers/`, all rights reserved by their owners (NOTICE). `example/` is the showcase app; its tests are golden
 images under `example/test/goldens/` and run as the `showcase / ci` job. Read
 the golden PNGs to see the current look without running anything.
 `example/README.md` is the component catalogue: it embeds those same PNGs
@@ -51,11 +54,10 @@ means updating the gallery section, its golden and that README together.
 
 - Branching (org standard, `tkforgeworks/.github/docs/branching-and-release.md`):
   `main` is the released state; work accumulates on the current release branch
-  `vX.Y.Z/main` (none open: `v0.1.0/main` shipped as `v0.1.0` on
-  2026-10-14, and `v0.0.1/main` was the repo-setup batch, merged); topic
-  branches
-  PR **into the release branch**, never into `main`; the release branch reaches
-  `main` via a release PR.
+  `vX.Y.Z/main` (currently **`v0.2.0/main`**, cut 2026-10-17; `v0.1.0/main`
+  shipped as `v0.1.0` on 2026-10-14 and `v0.0.1/main` was the repo-setup
+  batch, both merged); topic branches PR **into the release branch**, never
+  into `main`; the release branch reaches `main` via a release PR.
 - `main` is protected by the org repository ruleset: PR-only, no force-push or
   deletion, **no bypass actors** (not even admins). Required check: `ci / ci`.
   Release branches (`v*/main`) have a second ruleset: no force-push/deletion,
@@ -66,12 +68,14 @@ means updating the gallery section, its golden and that README together.
   Don't hand-roll steps that belong in the shared workflow — change it there.
   `dart format` ignores `analysis_options.yaml` excludes, so every `.dart`
   file in the repo must be formatted.
-- **Commit subjects are the changelog.** Imperative summary; bug fixes start
-  with `Fix ...`.
-- **No Jira project yet (open item).** Until one exists, topic branches are
-  `vX.Y.Z/<short-topic>` and subjects carry no key. Once it exists: branches
-  become `vX.Y.Z/<KEY>-N-short-topic`, subjects `<KEY>-N: Imperative summary`,
-  and the deviation in `.github/org-standards.yml` is removed.
+- **Jira project `FU`** (`https://tkforgeworks.atlassian.net/browse/FU`,
+  created 2026-10-17; forge-core is `FC`). **Commit subjects are the
+  changelog:** `FU-N: Imperative summary`; bug fixes `FU-N: Fix ...`.
+  Branches `vX.Y.Z/FU-N-short-topic`. Move a ticket to *In Progress* when
+  its branch opens. **Never close a ticket unless asked** — comment "Actions
+  taken" + commit hash and leave it for the human to verify. Commits before
+  FU-1 carry no key; the `org-standards.yml` deviation for that was removed
+  in FU-1.
 - Releases: `.github/workflows/release.yml` consumes the org
   `release-flutter.yml` with both platform builds off, so a release is a tag
   and a GitHub release with notes and no files. On the release branch,
@@ -80,8 +84,9 @@ means updating the gallery section, its golden and that README together.
   publishes `vX.Y.Z`. **Never hand-edit the version or push tags**; the
   workflow creates the tag. `pubspec.yaml` holds the upcoming version as
   `X.Y.Z[-rc.N]+BUILD` (the build number means nothing for a package but the
-  bump script requires it). No `ticket-prefix`, so release notes are the
-  commit subjects. The bump scripts are vendored copies of the org ones
+  bump script requires it). `ticket-prefix: FU` and the repo variable
+  `JIRA_BASE_URL` (both FU-2) make release notes link each `FU-N:` subject.
+  The bump scripts are vendored copies of the org ones
   (`tkforgeworks/.github` @ `a800dd1`); don't edit them here.
 - Apps consume a release as a git dependency pinned to an **exact tag**
   (`ref: vX.Y.Z`). Bumping that line is the only way an app picks up a change.
@@ -102,11 +107,19 @@ means updating the gallery section, its golden and that README together.
 - Shared widgets never hardcode a color. Every color comes from
   `Theme.of(context).colorScheme` or the `ForgeTokens` theme extension, or
   theme swapping breaks for every app.
-- Code is promoted into the package only when a second app needs it.
-- **The one exception to the color rule is `ForgeBrand`** (the forge gradient
-  and the mark's colors), plus the success pair inside `forge_tokens.dart`.
-  `test/no_hardcoded_colors_test.dart` fails on a color literal anywhere else
-  in `lib/`.
+- **High-reuse screens are built here first** (decided 2026-10-17): sign-in,
+  account, settings, about, licences and feedback screens go into the package
+  from the start, even with one consumer, so the next app gets the same views
+  without a migration; RCs and pin moves are cheap. The rule of three
+  (promote only when a second app needs it) applies to everything whose
+  reuse is ambiguous.
+- **The exceptions to the color rule are `ForgeBrand`** (the forge gradient
+  and the mark's colors), plus the success pair inside `forge_tokens.dart`,
+  and from v0.2 **`ForgeProviderBrand`**: the fill, stroke and text colors
+  Google mandates for its sign-in button (light `#FFFFFF`/`#747775`/
+  `#1F1F1F`, dark `#131314`/`#8E918F`/`#E3E3E3`, neutral `#F2F2F2`), kept
+  apart from the brand's own. `test/no_hardcoded_colors_test.dart` fails on
+  a color literal anywhere else in `lib/`.
 - `forgeTheme` takes a seed; an app with a designed palette also passes its
   own `colorScheme` and `tokens` (one pair per brightness) and its own
   extensions through `extensions`. The cheese app uses that path.
@@ -117,14 +130,36 @@ means updating the gallery section, its golden and that README together.
 - No named spacing or motion tokens exist yet. The cheese app has none to
   promote, so none were invented; add them when a real need shows up.
 - Fonts are fixed and bundled as static instances: Poppins (UI), Source
-  Serif 4 (editorial), JetBrains Mono (labels). No `google_fonts`.
+  Serif 4 (editorial), JetBrains Mono (labels). No `google_fonts`. v0.2 adds
+  a Medium instance of **Google Sans Flex** (Google's OFL 1.1 rebuild of
+  Google Sans, on Google Fonts since 2025-11) for the Google button label
+  only, which Google's branding guidelines require; never bundle the
+  proprietary Google Sans. Done in FU-2: the OFL declares no Reserved Font
+  Names and Google's TRADEMARKS.md allows the name to identify the font;
+  `GoogleSansFlex-Medium.ttf` is a static instance (`fontTools
+  varLib.instancer wght=500`, other axes at default, `pyftsubset` to Latin;
+  recipe in `assets/fonts/LICENSES.md`). The Google "G" is cropped from
+  Google's pre-approved button PNGs (the 2026 bundle's SVGs use filters and
+  `foreignObject` gradients Flutter can't render), background lifted to
+  alpha, shipped at 1x–4x; all rights reserved by Google, listed in
+  `NOTICE`. `ForgeSignInButton` loads it with an `errorBuilder` because this
+  package's own widget tests have no `packages/forge_ui/` prefix; the
+  showcase goldens are where it is really rendered.
 - Icons are Heroicons outline, through the `heroicons` package (MIT).
-- Release scope: v0.1 is theme, tokens, base components and the about screen;
-  the sign-in screen ships in v0.2 with forge-core v0.1, and account settings
-  in v0.3 with forge-core v0.2.
-- A null `onGoogle` / `onApple` callback hides that sign-in button. Linked
-  sign-in methods use forge_ui's own `ForgeSignInProvider` enum and
-  `ForgeLinkedSignIn` type.
+- Release scope: v0.1 is theme, tokens, base components and the about and
+  licences screens (shipped). **v0.2 ships the sign-in panel/screen and the
+  account settings page together**, alongside forge-core v0.1, for
+  cheesy-scribe 0.3.0 (2026-10-17; the earlier plan put account settings in
+  v0.3): `ForgeSignInProvider` (google, email, apple), `ForgeSignInButton`,
+  `ForgeSignInPanel` (Google button + email/password form: sign in, create
+  account, forgot password; embeddable in an app's Account screen),
+  `ForgeSignInScreen` (panel + optional skip), "check your email" and "set a
+  new password" screens, `ForgeAccountSettings`, `ForgeSignOutSheet` with an
+  "also erase this phone" option, `showForgeConfirmSheet(typeToConfirm:)`,
+  busy states. Apple's button is reserved for the first iOS app.
+- A null `onGoogle` / `onApple` callback hides that sign-in button; the
+  email/password form is always present. Linked sign-in methods use
+  forge_ui's own `ForgeSignInProvider` enum and `ForgeLinkedSignIn` type.
 
 ## Current status
 
@@ -152,17 +187,74 @@ package) and `v0.1.0-rc.3` (`ForgeAboutScreen.onSendFeedback`, CHEESE-51).
 Tim's device passes on its `v0.2.0` RCs found it matching, so `v0.1.0` was
 finalised on 2026-10-14 from the rc.3 code (`bump-version.sh final`, release
 PR `v0.1.0/main` → `main`) and the cheese app re-pinned to `ref: v0.1.0`.
+`v0.1.0/main` and `v0.0.1/main` were deleted on 2026-10-16 with the
+ruleset-toggle runbook.
+
+2026-10-17: Jira project `FU` created; `v0.2.0/main` cut from `main`; FU-1
+replaced the spec copy with a pointer to forge-core's canonical spec, which
+FC-1 revised the same day for cheesy-scribe 0.3.0 (Google and email/password
+sign-in, deletion in the first forge-core release, shared-first screens).
+
+2026-10-18: FU-2: `ForgeProviderBrand`, Google Sans Flex Medium, the Google
+"G" asset, `ForgeSignInButton` (Google light/dark/neutral, busy; email
+outlined; Apple asserts), `ForgeSignInProvider` and `ForgeLinkedSignIn`;
+"Sign in" gallery section, goldens and README; `ticket-prefix: FU` on the
+release workflow. The licences screen's `fontsLine` now names four fonts
+(cheesy-scribe's renders of that screen change when it re-pins). Shipped as
+`v0.2.0-rc.1`.
+
+2026-10-18: FU-3: `ForgeSignInPanel` (provider buttons over the email form
+with sign in / create / forgot modes, own validation, field + form errors,
+busy) and `ForgeSignInScreen` (app bar, optional "Not now"); "Sign-in
+panel" gallery section, sign-in screen goldens, README. Keys on the panel
+(`emailFieldKey`, `passwordFieldKey`, `submitKey`, `switchModeKey`,
+`forgotKey`, `showPasswordKey`) and `ForgeSignInScreen.skipKey` are what
+app tests drive. Shipped as `v0.2.0-rc.2`.
+
+2026-10-18: FU-4: `ForgeCheckEmailScreen` (confirm / reset wording, "Send
+again" on a cooldown that starts when the screen opens, change-address and
+Done; keys `resendKey`, `changeEmailKey`, `doneKey`) and
+`ForgeSetPasswordScreen` (two matching fields ≥ 8, show/hide, busy; keys
+`passwordFieldKey`, `confirmFieldKey`, `submitKey`, `showPasswordKey`);
+"Email screens" gallery entry, screen goldens, README. Shipped as
+`v0.2.0-rc.3`. FU-5 (typed / async confirm sheet) shipped as `v0.2.0-rc.4`.
+
+2026-10-18: FU-6: `ForgeAccountSettings` (signed-out → `signedOut` widget;
+signed-in → Account group with email and a username field saved once on
+Done or blur, Sign-in methods group with linked rows plus "Link Google" /
+"Set a password" when they apply, the app's `status` slot under
+`statusLabel`, Sign out and Delete account rows that open the shared
+sheets themselves: `onSignOut({eraseLocal})` after `showForgeSignOutSheet`,
+`onDeleteAccount` as the typed sheet's `onConfirmAsync`) and
+`showForgeSignOutSheet` / `ForgeSignOutSheet` with the "Also erase this
+phone" checkbox (`ForgeSignOutChoice`). Keys `usernameFieldKey`,
+`linkGoogleKey`, `setPasswordKey`, `signOutKey`, `deleteKey`,
+`ForgeSignOutSheet.eraseKey/confirmKey/cancelKey`. With it the v0.2 scope
+is complete.
+
+2026-10-18: FU-5: `showForgeConfirmSheet` gained `typeToConfirm` (+
+`caseSensitive`) and `onConfirmAsync` (`Future<String?>`: null closes with
+true, a message keeps the sheet open as an error under the field; progress
+in the confirm button, cancel disabled, `PopScope(canPop: false)` while
+busy). `ForgeConfirmSheet` is stateful now; keys `fieldKey`, `confirmKey`,
+`cancelKey`. Existing callers unchanged.
+
+2026-10-19: **v0.2.0 final cut from rc.6's code** (this status change
+only). cheesy-scribe 0.3.0 adopted rc.1–rc.6 across eleven RCs on Tim's
+device (sign-in panel, check-email and set-password screens, account
+settings, typed confirm sheet, sign-out sheet) and re-pins to `v0.2.0`.
 
 ## Next actions
 
-`main` is PR-only, so every change, including edits to this file and the
-spec, goes through a topic branch and a PR into a release branch. None is
-open now: cut one from `main` first.
+`main` is PR-only, so every change, including edits to this file, goes
+through a topic branch and a PR into `v0.2.0/main`.
 
-1. forge-ui v0.2: the sign-in screen, alongside forge-core v0.1, on
-   `v0.2.0/main`.
-2. Delete `v0.1.0/main` now that `v0.1.0` is tagged (see the
-   `v0.0.1/main` item below: same ruleset step, Tim's explicit yes).
+1. **v0.2.0 released** (2026-10-19; FU-2..6 done, adopted by cheesy-scribe
+   0.3.0 and re-pinned to the stable tag). Next work opens a new release
+   branch from `main`. Candidates: Apple sign-in branding when an iOS app
+   exists, an email-change screen alongside forge-core's API.
+2. Keep the callback shapes aligned with forge-core's real API as it lands
+   (the spec's `ForgeAccountSettings` sketch is the contract).
 
 ## Open items
 
@@ -173,17 +265,10 @@ open now: cut one from `main` first.
 
 ### Repo and process
 
-- **Jira project.** None exists for forge-ui, and Tim does not want one yet
-  (decided 2026-10-10). Follow the no-key convention above. If one is ever
-  created, switch branch names and subjects to the keyed form and remove the
-  deviation from `.github/org-standards.yml`.
 - **Release pipeline gate.** Fixed in the org workflow on 2026-10-10
   (`tkforgeworks/.github` PR #16): `publish` now requires the CI gate to have
   passed. No release has run under the fix with a failing gate, so the first
   time a gate fails, confirm that nothing was published.
-- **`v0.0.1/main` still exists.** It is fully merged, has no tag, and the
-  `release-branches` ruleset blocks deleting it. Removing it means disabling
-  that ruleset briefly, which needs Tim's explicit yes.
 - **Goldens are compared exactly.** They were generated on Linux with
   Flutter 3.47.5, the version CI pins. Bumping Flutter means regenerating
   them in the same PR.

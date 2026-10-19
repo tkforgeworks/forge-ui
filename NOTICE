@@ -39,6 +39,19 @@ assets/fonts/LICENSES.md.
                    assets/fonts/licenses/SourceSerif4-OFL.md
   JetBrains Mono   Copyright 2020 The JetBrains Mono Project Authors
                    assets/fonts/licenses/JetBrainsMono-OFL.txt
+  Google Sans Flex Copyright 2025 The Google Sans Flex Project Authors; a
+                   static Medium instance, Latin subset, of the variable
+                   font (a Modified Version under the OFL; no Reserved Font
+                   Names). "Google", "Google Sans" and "Google Sans Flex" are
+                   trademarks of Google LLC and are used only to name the
+                   font. assets/fonts/licenses/GoogleSansFlex-OFL.txt
+
+The Google "G" logo (assets/brand/providers/google_g.png and its 2.0x, 3.0x
+and 4.0x variants) is Google LLC's, taken unmodified in colour and shape from
+Google's pre-approved "Sign in with Google" button assets
+(https://developers.google.com/identity/branding-guidelines) and used only
+on the Google sign-in button, as those guidelines require. All rights
+reserved by Google LLC; it is not covered by the Apache License.
 
 The launcher icons under example/android/ are the Flutter project template's
 (Copyright The Flutter Authors, BSD 3-Clause).

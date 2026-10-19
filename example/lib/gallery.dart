@@ -49,6 +49,24 @@ class _GalleryScreenState extends State<GalleryScreen> {
     if (mounted) _say(confirmed ? 'Confirmed.' : 'Cancelled.');
   }
 
+  /// The typed variant, running a pretend deletion that fails once.
+  var _typedAttempts = 0;
+  Future<void> _confirmTyped() async {
+    final confirmed = await showForgeConfirmSheet(
+      context,
+      title: 'Delete your account?',
+      aside: 'Your notes stay on this phone unless you erase them too.',
+      confirmLabel: 'Delete account',
+      typeToConfirm: 'DELETE',
+      onConfirmAsync: () async {
+        await Future<void>.delayed(const Duration(seconds: 1));
+        _typedAttempts++;
+        return _typedAttempts.isOdd ? "Couldn't reach the server." : null;
+      },
+    );
+    if (mounted) _say(confirmed ? 'Deleted.' : 'Kept.');
+  }
+
   void _open(Widget screen) {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => screen));
   }
@@ -68,6 +86,28 @@ class _GalleryScreenState extends State<GalleryScreen> {
     onOpenPrivacyPolicy: () => _say('Would open the privacy policy.'),
     onOpenDeleteAccount: () => _say('Would open the deletion page.'),
     onOpenLicenses: () => _open(_licenses()),
+  );
+
+  Widget _signIn() => ForgeSignInScreen(
+    heading: 'Back up your notes',
+    blurb: 'Sign in and they follow you to your next phone.',
+    onGoogle: () => _say('Google.'),
+    onEmailSignIn: (email, _) => _say('Sign in as $email.'),
+    onEmailCreate: (email, _) => _say('Create $email.'),
+    onForgotPassword: (email) => _say('Reset for $email.'),
+    onSkip: () => Navigator.of(context).pop(),
+  );
+
+  Widget _checkEmail() => ForgeCheckEmailScreen(
+    email: 'tim@example.com',
+    purpose: ForgeEmailPurpose.confirm,
+    onResend: () => _say('Sent again.'),
+    onChangeEmail: () => Navigator.of(context).pop(),
+    onDone: () => Navigator.of(context).pop(),
+  );
+
+  Widget _setPassword() => ForgeSetPasswordScreen(
+    onSubmit: (password) => _say('Saved ${password.length} characters.'),
   );
 
   Widget _licenses() => ForgeLicensesScreen(
@@ -276,6 +316,73 @@ class _GalleryScreenState extends State<GalleryScreen> {
               ],
             ),
           ),
+          _Section(
+            'Sign in',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ForgeSignInButton(
+                  provider: ForgeSignInProvider.google,
+                  onPressed: () => _say('Google.'),
+                ),
+                const SizedBox(height: 12),
+                ForgeSignInButton(
+                  provider: ForgeSignInProvider.google,
+                  theme: ForgeProviderButtonTheme.neutral,
+                  onPressed: () => _say('Google, neutral.'),
+                ),
+                const SizedBox(height: 12),
+                ForgeSignInButton(
+                  provider: ForgeSignInProvider.google,
+                  busy: true,
+                  onPressed: () {},
+                ),
+                const SizedBox(height: 12),
+                ForgeSignInButton(
+                  provider: ForgeSignInProvider.email,
+                  onPressed: () => _say('Email.'),
+                ),
+              ],
+            ),
+          ),
+          _Section(
+            'Sign-in panel',
+            child: ForgeSignInPanel(
+              heading: 'Back up your notes',
+              blurb: 'Sign in and they follow you to your next phone.',
+              onGoogle: () => _say('Google.'),
+              onEmailSignIn: (email, _) => _say('Sign in as $email.'),
+              onEmailCreate: (email, _) => _say('Create $email.'),
+              onForgotPassword: (email) => _say('Reset for $email.'),
+            ),
+          ),
+          _Section(
+            'Account settings',
+            child: ForgeAccountSettings(
+              email: 'tim@example.com',
+              username: 'Tim',
+              onUsernameChanged: (v) => _say('Username → $v'),
+              linked: const [
+                ForgeLinkedSignIn(
+                  provider: ForgeSignInProvider.email,
+                  email: 'tim@example.com',
+                ),
+              ],
+              onLink: (p) => _say('Link ${p.label}.'),
+              onSetPassword: () => _say('Set a password.'),
+              status: const ListTile(
+                title: Text('Backed up'),
+                subtitle: Text('Last synced a minute ago'),
+                trailing: ForgeStatusCapsule('Up to date', active: true),
+              ),
+              onSignOut: ({required eraseLocal}) async =>
+                  _say(eraseLocal ? 'Signed out and erased.' : 'Signed out.'),
+              onDeleteAccount: () async {
+                await Future<void>.delayed(const Duration(seconds: 1));
+                return null;
+              },
+            ),
+          ),
           const _Section(
             'Fields',
             child: Column(
@@ -433,19 +540,45 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
+                Material(
+                  color: c.surfaceContainerLowest,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(ForgeRadii.fab),
+                    side: BorderSide(color: c.outline),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: IgnorePointer(
+                    child: const ForgeConfirmSheet(
+                      title: 'Delete your account?',
+                      aside:
+                          'Your notes stay on this phone unless you erase '
+                          'them too.',
+                      confirmLabel: 'Delete account',
+                      typeToConfirm: 'DELETE',
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => _confirm(destructive: true),
-                        child: const Text('Open destructive'),
+                        child: const Text('Delete'),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => _confirm(destructive: false),
-                        child: const Text('Open plain'),
+                        child: const Text('Sign out'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: _confirmTyped,
+                        child: const Text('Typed'),
                       ),
                     ),
                   ],
@@ -470,6 +603,33 @@ class _GalleryScreenState extends State<GalleryScreen> {
                     child: const Text('Licences'),
                   ),
                 ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => _open(_signIn()),
+                    child: const Text('Sign in'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          _Section(
+            'Email screens',
+            child: Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => _open(_checkEmail()),
+                    child: const Text('Check email'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => _open(_setPassword()),
+                    child: const Text('New password'),
+                  ),
+                ),
               ],
             ),
           ),
@@ -486,6 +646,9 @@ const gallerySections = [
   'Brand',
   'Type',
   'Buttons',
+  'Sign in',
+  'Sign-in panel',
+  'Account settings',
   'Fields',
   'Selection',
   'Main action',
@@ -496,6 +659,7 @@ const gallerySections = [
   'Loading',
   'Confirm sheet',
   'Screens',
+  'Email screens',
 ];
 
 /// The key on a section's repaint boundary, for tests that photograph it.

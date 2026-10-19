@@ -67,10 +67,14 @@ forgeTheme(
 | `ForgeType`, `ForgeRadii`, `ForgeBrand` | Type helpers, corner radii, the forge gradient and mark colors |
 | `ForgeMonoLabel`, `ForgeTagCapsule`, `ForgeStatusCapsule` | Uppercase mono labels and capsules |
 | `ForgeBoxedField` | Outlined text field with its label outside |
-| `showForgeConfirmSheet` | Confirmation bottom sheet, destructive by default |
+| `showForgeConfirmSheet` | Confirmation bottom sheet, destructive by default; `typeToConfirm` and `onConfirmAsync` for the irreversible cases |
 | `ForgeEmptyState`, `ForgeErrorCard`, `ForgeSkeletonList` | Empty, error and loading states |
 | `ForgeSettingsGroup` | Labelled card of divider-separated rows |
 | `ForgeFab` | The one gradient button |
+| `ForgeSignInButton`, `ForgeSignInProvider`, `ForgeLinkedSignIn`, `ForgeProviderBrand` | Provider sign-in buttons (Google to Google's branding rules) and the plain types the account page uses |
+| `ForgeSignInPanel`, `ForgeSignInScreen` | The sign-in surface: provider buttons plus the email form (sign in, create, forgot), embeddable or as a screen |
+| `ForgeCheckEmailScreen`, `ForgeSetPasswordScreen` | The email flow's waiting state (with resend cooldown) and the new-password form |
+| `ForgeAccountSettings`, `showForgeSignOutSheet` | The account page body (email, username, linked methods, status slot, sign out, delete) and the sign-out sheet with "also erase this phone" |
 | `ForgeWorksMark` | The hammer-and-anvil maker mark |
 | `ForgeAboutScreen`, `ForgeLicensesScreen` | About and licences screens; links are callbacks |
 

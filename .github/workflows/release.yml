@@ -11,8 +11,9 @@
 # version's tag exists and creates the tag when it publishes the GitHub
 # release. Never hand-edit the version or push tags.
 #
-# No ticket-prefix: there is no Jira project, so the release notes are the
-# plain commit subjects since the previous tag.
+# ticket-prefix FU: release notes link each `FU-N:` subject to Jira through
+# the repository variable JIRA_BASE_URL (commits before FU-1 carry no key and
+# stay plain).
 name: Release
 
 on:
@@ -33,3 +34,4 @@ jobs:
       flutter-version: '3.47.5'
       build-windows: false
       build-android: false
+      ticket-prefix: FU

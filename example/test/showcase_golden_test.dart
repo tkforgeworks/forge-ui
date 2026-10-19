@@ -13,7 +13,7 @@ import 'package:forge_ui_showcase/showcase_app.dart';
 /// `flutter test --update-goldens` and look at the images before committing.
 void main() {
   // A phone-width page tall enough to hold the whole gallery.
-  const gallerySize = Size(412, 3220);
+  const gallerySize = Size(412, 5100);
   const screenSize = Size(412, 900);
 
   String slug(String name) =>
@@ -80,10 +80,12 @@ void main() {
         );
         await settle(tester);
         final first = index == 0;
-        // The "Screens" section is only two buttons; the screens themselves
+        // The "Screens" sections are only buttons; the screens themselves
         // are photographed below.
         final titles = first
-            ? gallerySections.where((title) => title != 'Screens')
+            ? gallerySections.where(
+                (title) => title != 'Screens' && title != 'Email screens',
+              )
             : ['Palette', 'Buttons'];
         for (final title in titles) {
           final section = find.byKey(gallerySectionKey(title));
@@ -145,6 +147,48 @@ void main() {
             onOpenDeleteAccount: () {},
             onOpenLicenses: () {},
           ),
+        );
+      });
+
+      goldenTest('sign-in: ${sample.name}, ${brightness.name}', (tester) async {
+        await shoot(
+          tester,
+          'sign_in',
+          ForgeSignInScreen(
+            heading: 'Back up your notes',
+            blurb: 'Sign in and they follow you to your next phone.',
+            onGoogle: () {},
+            onEmailSignIn: (_, _) {},
+            onEmailCreate: (_, _) {},
+            onForgotPassword: (_) {},
+            onSkip: () {},
+          ),
+        );
+      });
+
+      goldenTest('check-email: ${sample.name}, ${brightness.name}', (
+        tester,
+      ) async {
+        await shoot(
+          tester,
+          'check_email',
+          ForgeCheckEmailScreen(
+            email: 'tim@example.com',
+            purpose: ForgeEmailPurpose.confirm,
+            onResend: () {},
+            onChangeEmail: () {},
+            onDone: () {},
+          ),
+        );
+      });
+
+      goldenTest('set-password: ${sample.name}, ${brightness.name}', (
+        tester,
+      ) async {
+        await shoot(
+          tester,
+          'set_password',
+          ForgeSetPasswordScreen(onSubmit: (_) {}),
         );
       });
 

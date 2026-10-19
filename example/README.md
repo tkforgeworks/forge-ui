@@ -94,6 +94,121 @@ TextButton(onPressed: forgot, child: const Text('Forgot password?'));
   <img src="test/goldens/components/buttons_dark.png" width="400" alt="Buttons, dark">
 </p>
 
+## Sign-in buttons
+
+`ForgeSignInButton` draws "Continue with …" for a provider. Google's follows
+Google's branding guidelines exactly (their colours from `ForgeProviderBrand`,
+their official "G", Google Sans Medium, 40 high, pill): light or dark follows
+the theme, or pass `theme: ForgeProviderButtonTheme.neutral`. The email
+button is an ordinary outlined button. `busy` swaps the logo for a progress
+ring and disables the button. Apple is reserved for the first iOS app.
+
+```dart
+ForgeSignInButton(provider: ForgeSignInProvider.google, onPressed: signInWithGoogle);
+ForgeSignInButton(provider: ForgeSignInProvider.google, busy: true, onPressed: () {});
+ForgeSignInButton(provider: ForgeSignInProvider.email, onPressed: showEmailForm);
+```
+
+<p>
+  <img src="test/goldens/components/sign_in_light.png" width="400" alt="Sign-in buttons, light">
+  <img src="test/goldens/components/sign_in_dark.png" width="400" alt="Sign-in buttons, dark">
+</p>
+
+## Sign-in panel and screen
+
+`ForgeSignInPanel` is the whole sign-in surface: the provider buttons above
+an always-present email form that switches between **sign in**, **create an
+account** and **forgot password**. Callbacks in, no auth logic: the app runs
+the request and drives `busy` and `errorText` from the result. The panel
+validates the address and (on create) an 8-character minimum itself, with
+field-level errors on submit. A null `onGoogle` / `onApple` hides that
+button; at least one is required. Embed it in your own screen, or use
+`ForgeSignInScreen`, which adds the app bar and an optional "Not now".
+
+```dart
+ForgeSignInPanel(
+  heading: 'Back up your notes',
+  blurb: 'Sign in and they follow you to your next phone.',
+  onGoogle: signInWithGoogle,
+  onEmailSignIn: (email, password) => auth.signInWithEmail(email, password),
+  onEmailCreate: (email, password) => auth.signUpWithEmail(email, password),
+  onForgotPassword: auth.sendPasswordReset,
+  busy: state.isBusy,
+  errorText: state.error,
+);
+```
+
+<p>
+  <img src="test/goldens/components/sign_in_panel_light.png" width="400" alt="Sign-in panel, light">
+  <img src="test/goldens/components/sign_in_panel_dark.png" width="400" alt="Sign-in panel, dark">
+</p>
+<p>
+  <img src="test/goldens/sign_in_violet_light.png" width="300" alt="Sign-in screen, light">
+  <img src="test/goldens/sign_in_violet_dark.png" width="300" alt="Sign-in screen, dark">
+</p>
+
+## Account settings
+
+`ForgeAccountSettings` is the shared account page body. Signed out (`email`
+null) it shows `signedOut`, usually a `ForgeSignInPanel`. Signed in: the
+email, a username field saved on Done or blur, the linked sign-in methods
+with "Link Google" / "Set a password" rows when they apply, a slot for the
+app's backup status, then Sign out and Delete account. The two destructive
+rows open the shared sheets themselves: `onSignOut` gets the "Also erase
+this phone" choice from `showForgeSignOutSheet`, and `onDeleteAccount` runs
+inside the typed confirmation sheet (return null on success, a message to
+keep it open). The app's own profile header goes above the widget.
+
+```dart
+ForgeAccountSettings(
+  email: session.email,
+  username: account?.username,
+  onUsernameChanged: accounts.setUsername,
+  linked: [for (final i in session.identities) ForgeLinkedSignIn(provider: map(i.provider), email: i.email)],
+  onLink: (_) => auth.linkGoogle(),
+  onSetPassword: () => context.push('/account/set-password'),
+  status: BackupStatusRow(),
+  onSignOut: ({required eraseLocal}) => signOut(eraseLocal),
+  onDeleteAccount: () async => (await accounts.deleteAccount()) is ForgeFailed ? "Couldn't reach the server." : null,
+  signedOut: ForgeSignInPanel(/* … */),
+);
+```
+
+<p>
+  <img src="test/goldens/components/account_settings_light.png" width="400" alt="Account settings, light">
+  <img src="test/goldens/components/account_settings_dark.png" width="400" alt="Account settings, dark">
+</p>
+
+## Email screens
+
+`ForgeCheckEmailScreen` is the waiting state after a sign-up
+(`ForgeEmailPurpose.confirm`) or a reset request (`ForgeEmailPurpose.reset`):
+the address the mail went to, "Send again" on a cooldown that starts the
+moment the screen opens, "Use a different address" and Done.
+`ForgeSetPasswordScreen` is the form the app shows when it opens from a
+reset link (or for "Set a password" on a Google-only account): two fields
+that must match and reach eight characters. Both take `busy` and
+`errorText` from the app.
+
+```dart
+ForgeCheckEmailScreen(
+  email: email,
+  purpose: ForgeEmailPurpose.confirm,
+  onResend: () => auth.resendConfirmation(email),
+  onChangeEmail: () => context.pop(),
+  onDone: () => context.go('/account'),
+);
+
+ForgeSetPasswordScreen(onSubmit: auth.updatePassword, busy: saving);
+```
+
+<p>
+  <img src="test/goldens/check_email_violet_light.png" width="300" alt="Check your email, light">
+  <img src="test/goldens/check_email_violet_dark.png" width="300" alt="Check your email, dark">
+  <img src="test/goldens/set_password_violet_light.png" width="300" alt="New password, light">
+  <img src="test/goldens/set_password_violet_dark.png" width="300" alt="New password, dark">
+</p>
+
 ## Fields
 
 `ForgeBoxedField` is the theme's outlined text field with its mono label
@@ -282,6 +397,27 @@ if (confirmed) deleteAccount();
 
 The top card is the sheet's content; the buttons under it open the real
 sheet in the running app.
+
+The typed variant guards the irreversible: `typeToConfirm` keeps the
+destructive button disabled until the user types the word (case-insensitive
+unless `caseSensitive: true`), and `onConfirmAsync` runs the action inside
+the sheet, showing progress and refusing dismissal while it runs. Return
+`null` to close with `true`; return a message to keep the sheet open with
+that message under the field.
+
+```dart
+final deleted = await showForgeConfirmSheet(
+  context,
+  title: 'Delete your account?',
+  aside: 'Your notes stay on this phone unless you erase them too.',
+  confirmLabel: 'Delete account',
+  typeToConfirm: 'DELETE',
+  onConfirmAsync: () async {
+    final result = await core.accounts.deleteAccount();
+    return result is ForgeAuthFailure ? "Couldn't reach the server." : null;
+  },
+);
+```
 
 ## Brand marks
 
