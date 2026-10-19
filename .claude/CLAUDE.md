@@ -230,8 +230,7 @@ sheets themselves: `onSignOut({eraseLocal})` after `showForgeSignOutSheet`,
 phone" checkbox (`ForgeSignOutChoice`). Keys `usernameFieldKey`,
 `linkGoogleKey`, `setPasswordKey`, `signOutKey`, `deleteKey`,
 `ForgeSignOutSheet.eraseKey/confirmKey/cancelKey`. With it the v0.2 scope
-is complete; `v0.2.0` goes final when cheesy-scribe 0.3.0 has adopted the
-RCs on a device (CHEESE-67).
+is complete.
 
 2026-10-18: FU-5: `showForgeConfirmSheet` gained `typeToConfirm` (+
 `caseSensitive`) and `onConfirmAsync` (`Future<String?>`: null closes with
@@ -240,21 +239,20 @@ in the confirm button, cancel disabled, `PopScope(canPop: false)` while
 busy). `ForgeConfirmSheet` is stateful now; keys `fieldKey`, `confirmKey`,
 `cancelKey`. Existing callers unchanged.
 
+2026-10-19: **v0.2.0 final cut from rc.6's code** (this status change
+only). cheesy-scribe 0.3.0 adopted rc.1–rc.6 across eleven RCs on Tim's
+device (sign-in panel, check-email and set-password screens, account
+settings, typed confirm sheet, sign-out sheet) and re-pins to `v0.2.0`.
+
 ## Next actions
 
 `main` is PR-only, so every change, including edits to this file, goes
 through a topic branch and a PR into `v0.2.0/main`.
 
-1. forge-ui v0.2 as FU tickets: FU-2 (done) `ForgeProviderBrand` + Google
-   Sans Flex + the "G" asset and `ForgeSignInButton`; FU-3 (done)
-   `ForgeSignInPanel` / `ForgeSignInScreen`; FU-4 (done) the two email
-   screens; FU-5 (done) the typed / async confirm sheet; FU-6 (done)
-   `ForgeAccountSettings` + `ForgeSignOutSheet`;
-   FU-5 `showForgeConfirmSheet(typeToConfirm:)` and busy states; FU-6
-   `ForgeAccountSettings` and `ForgeSignOutSheet`; showcase gallery, goldens
-   and `example/README.md` for each. Cut RCs as pieces land; cheesy-scribe
-   `v0.3.0/main` consumes them against forge-core's RCs (forge-core
-   `v0.1.0-rc.1` exists since 2026-10-18).
+1. **v0.2.0 released** (2026-10-19; FU-2..6 done, adopted by cheesy-scribe
+   0.3.0 and re-pinned to the stable tag). Next work opens a new release
+   branch from `main`. Candidates: Apple sign-in branding when an iOS app
+   exists, an email-change screen alongside forge-core's API.
 2. Keep the callback shapes aligned with forge-core's real API as it lands
    (the spec's `ForgeAccountSettings` sketch is the contract).
 
