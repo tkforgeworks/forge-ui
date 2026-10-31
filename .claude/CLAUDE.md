@@ -54,9 +54,10 @@ means updating the gallery section, its golden and that README together.
 
 - Branching (org standard, `tkforgeworks/.github/docs/branching-and-release.md`):
   `main` is the released state; work accumulates on the current release branch
-  `vX.Y.Z/main` (currently **`v0.2.0/main`**, cut 2026-10-17; `v0.1.0/main`
-  shipped as `v0.1.0` on 2026-10-14 and `v0.0.1/main` was the repo-setup
-  batch, both merged); topic branches PR **into the release branch**, never
+  `vX.Y.Z/main` (currently **`v0.2.1/main`**, cut from `main` on 2026-10-31
+  for FU-8; `v0.2.0/main` shipped as `v0.2.0` on 2026-10-19, `v0.1.0/main`
+  as `v0.1.0` on 2026-10-14 and `v0.0.1/main` was the repo-setup batch, all
+  merged); topic branches PR **into the release branch**, never
   into `main`; the release branch reaches `main` via a release PR.
 - `main` is protected by the org repository ruleset: PR-only, no force-push or
   deletion, **no bypass actors** (not even admins). Required check: `ci / ci`.
@@ -247,13 +248,19 @@ settings, typed confirm sheet, sign-out sheet) and re-pins to `v0.2.0`.
 ## Next actions
 
 `main` is PR-only, so every change, including edits to this file, goes
-through a topic branch and a PR into `v0.2.0/main`.
+through a topic branch and a PR into `v0.2.1/main`.
 
 1. **v0.2.0 released** (2026-10-19; FU-2..6 done, adopted by cheesy-scribe
-   0.3.0 and re-pinned to the stable tag). Next work opens a new release
-   branch from `main`. Candidates: Apple sign-in branding when an iOS app
-   exists, an email-change screen alongside forge-core's API.
-2. Keep the callback shapes aligned with forge-core's real API as it lands
+   0.3.0 and re-pinned to the stable tag).
+2. **v0.2.1** (`v0.2.1/main`, 2026-10-31): FU-8 gives `ForgeAboutScreen` an
+   optional `floatingActionButton` (passed to its Scaffold; the list's
+   bottom padding grows from 40 to `ForgeAboutScreen.fabBottomPadding`, 88,
+   only when one is set, so the about golden is unchanged) for
+   cheesy-scribe's floating feedback button (CHEESE-72). A patch release so
+   FU-7 (Apple sign-in, 0.3.0, for cheesy-scribe 1.0.0) keeps its number.
+   The showcase's about entry passes no button on purpose: its golden is
+   the "unchanged without one" check; `example/README.md` names the slot.
+3. Keep the callback shapes aligned with forge-core's real API as it lands
    (the spec's `ForgeAccountSettings` sketch is the contract).
 
 ## Open items
