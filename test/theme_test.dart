@@ -429,4 +429,49 @@ void main() {
       Color(0xFFEE3423),
     ]);
   });
+
+  group('scrollbar theme', () {
+    for (final density in ForgeDensity.values) {
+      test('${density.name}: palette thumb, 8 thick, tag radius', () {
+        final t = forgeTheme(seed: testSeed, density: density);
+        final x = t.extension<ForgeTokens>()!;
+        final sb = t.scrollbarTheme;
+        expect(sb.thumbColor!.resolve({}), x.textGhost);
+        expect(sb.thumbColor!.resolve({WidgetState.hovered}), x.textTertiary);
+        expect(sb.thumbColor!.resolve({WidgetState.dragged}), x.textTertiary);
+        expect(sb.thickness!.resolve({}), 8);
+        expect(sb.radius, const Radius.circular(ForgeRadii.tag));
+        expect(sb.trackVisibility, isNull);
+      });
+    }
+
+    test('thumb is always visible on desktop only', () {
+      final desktop = forgeTheme(seed: testSeed, density: ForgeDensity.desktop);
+      final touch = forgeTheme(seed: testSeed);
+      expect(desktop.scrollbarTheme.thumbVisibility!.resolve({}), isTrue);
+      expect(touch.scrollbarTheme.thumbVisibility, isNull);
+    });
+
+    testWidgets('a long list gets a scrollbar on desktop platforms', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(400, 300);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: forgeTheme(seed: testSeed, density: ForgeDensity.desktop),
+          home: Scaffold(
+            body: ListView.builder(
+              itemCount: 100,
+              itemBuilder: (_, i) => Text('Row $i'),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      expect(find.byType(Scrollbar), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }, variant: TargetPlatformVariant.desktop());
+  });
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forge_ui/forge_ui.dart';
@@ -104,30 +105,42 @@ void main() {
     }
   }
 
-  // The buttons under desktop density, for the README: sized to their
-  // labels at 36 high instead of stretched to thumb height.
-  for (final mode in [ThemeMode.light, ThemeMode.dark]) {
-    goldenTest('buttons, desktop density: ${mode.name}', (tester) async {
-      useSurface(tester, gallerySize);
-      await tester.pumpWidget(
-        ShowcaseApp(
-          initialSample: 0,
-          initialMode: mode,
-          initialDensity: ForgeDensity.desktop,
-        ),
-      );
-      await settle(tester);
-      final boundary = tester.renderObject<RenderRepaintBoundary>(
-        find.byKey(gallerySectionKey('Buttons')),
-      );
-      await expectLater(
-        boundary.toImage(pixelRatio: 2),
-        matchesGoldenFile(
-          'goldens/components/buttons_desktop_${mode.name}.png',
-        ),
-      );
-      await tester.pumpWidget(const SizedBox.shrink());
-    });
+  // Sections that change under desktop density, for the README: buttons
+  // sized to their labels at 36 high instead of stretched to thumb height,
+  // and the scrollbar thumb that stays showing.
+  for (final (title, name) in [
+    ('Buttons', 'buttons'),
+    ('Scrolling', 'scrolling'),
+  ]) {
+    for (final mode in [ThemeMode.light, ThemeMode.dark]) {
+      goldenTest('$name, desktop density: ${mode.name}', (tester) async {
+        // Material only adds a scrollbar to lists on desktop platforms, and
+        // flutter_test runs as Android; the override has to be cleared
+        // before the test body returns.
+        debugDefaultTargetPlatformOverride = TargetPlatform.linux;
+        addTearDown(() => debugDefaultTargetPlatformOverride = null);
+        useSurface(tester, gallerySize);
+        await tester.pumpWidget(
+          ShowcaseApp(
+            initialSample: 0,
+            initialMode: mode,
+            initialDensity: ForgeDensity.desktop,
+          ),
+        );
+        await settle(tester);
+        final boundary = tester.renderObject<RenderRepaintBoundary>(
+          find.byKey(gallerySectionKey(title)),
+        );
+        await expectLater(
+          boundary.toImage(pixelRatio: 2),
+          matchesGoldenFile(
+            'goldens/components/${name}_desktop_${mode.name}.png',
+          ),
+        );
+        await tester.pumpWidget(const SizedBox.shrink());
+        debugDefaultTargetPlatformOverride = null;
+      });
+    }
   }
 
   for (final sample in [samples.first, creamAndAmber]) {
