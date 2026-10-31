@@ -104,6 +104,29 @@ TextButton(onPressed: forgot, child: const Text('Forgot password?'));
   <img src="test/goldens/components/buttons_dark.png" width="400" alt="Buttons, dark">
 </p>
 
+Those are phone sizes: a filled or outlined button stretches to its parent's
+width, so one inside a bare `Row` throws. A mouse-driven app passes
+`density: ForgeDensity.desktop` to `forgeTheme`, and every filled, outlined
+and text button sizes to its label at 36 high, with tighter fields, search
+bars and list tiles to match. Wrap a button in `Expanded` where it should
+still fill a row.
+
+```dart
+MaterialApp(
+  theme: forgeTheme(seed: seed, density: ForgeDensity.desktop),
+  darkTheme: forgeTheme(
+    seed: seed,
+    brightness: Brightness.dark,
+    density: ForgeDensity.desktop,
+  ),
+);
+```
+
+<p>
+  <img src="test/goldens/components/buttons_desktop_light.png" width="400" alt="Buttons at desktop density, light">
+  <img src="test/goldens/components/buttons_desktop_dark.png" width="400" alt="Buttons at desktop density, dark">
+</p>
+
 ## Sign-in buttons
 
 `ForgeSignInButton` draws "Continue with …" for a provider. Google's follows
@@ -561,7 +584,9 @@ Dark:
 flutter run -d linux      # or an Android device
 ```
 
-Open the drawer to switch palette; the sun/moon button switches brightness.
+Open the drawer to switch palette; the sun/moon button switches brightness,
+and the desktop/phone button next to it switches between touch and desktop
+density.
 
 ## Golden tests
 

@@ -4,6 +4,79 @@ import 'package:heroicons/heroicons.dart';
 import 'forge_tokens.dart';
 import 'forge_type.dart';
 
+/// How tightly `forgeTheme` sizes its controls.
+enum ForgeDensity {
+  /// The phone defaults the brand started on: full-width, thumb-height
+  /// buttons (50 filled, 48 outlined) and roomy fields. The default.
+  touch,
+
+  /// Mouse-driven apps such as Anvil: buttons sized to their label at 36
+  /// high, tighter fields, search bars and list tiles, and
+  /// `VisualDensity.compact` everywhere else.
+  desktop,
+}
+
+/// The sizes that differ between the [ForgeDensity] values. A null leaves
+/// Material's own default in place, which is how `touch` stays exactly as
+/// it was before densities existed.
+class _Metrics {
+  const _Metrics({
+    required this.filledMinimumSize,
+    required this.outlinedMinimumSize,
+    required this.textMinimumSize,
+    required this.buttonPadding,
+    required this.buttonTapTargetSize,
+    required this.buttonVisualDensity,
+    required this.inputPadding,
+    required this.searchMinHeight,
+    required this.visualDensity,
+  });
+
+  final Size filledMinimumSize;
+  final Size outlinedMinimumSize;
+  final Size? textMinimumSize;
+  final EdgeInsetsGeometry? buttonPadding;
+  final MaterialTapTargetSize? buttonTapTargetSize;
+
+  /// Pinned to standard on desktop so the compact theme density does not
+  /// shave another 8 off the 36 button height.
+  final VisualDensity? buttonVisualDensity;
+  final EdgeInsetsGeometry inputPadding;
+  final double searchMinHeight;
+
+  /// Theme-wide and list tiles; null keeps Material's platform default.
+  final VisualDensity? visualDensity;
+
+  static const touch = _Metrics(
+    filledMinimumSize: Size.fromHeight(50),
+    outlinedMinimumSize: Size.fromHeight(48),
+    textMinimumSize: null,
+    buttonPadding: null,
+    buttonTapTargetSize: null,
+    buttonVisualDensity: null,
+    inputPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    searchMinHeight: 52,
+    visualDensity: null,
+  );
+
+  static const desktop = _Metrics(
+    filledMinimumSize: Size(0, 36),
+    outlinedMinimumSize: Size(0, 36),
+    textMinimumSize: Size(0, 36),
+    buttonPadding: EdgeInsets.symmetric(horizontal: 16),
+    buttonTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    buttonVisualDensity: VisualDensity.standard,
+    inputPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    searchMinHeight: 40,
+    visualDensity: VisualDensity.compact,
+  );
+
+  static _Metrics of(ForgeDensity density) => switch (density) {
+    ForgeDensity.touch => touch,
+    ForgeDensity.desktop => desktop,
+  };
+}
+
 /// Builds the tkforgeworks theme for an app.
 ///
 /// An app passes its [seed] colour and gets the whole brand: type, shapes,
@@ -25,6 +98,10 @@ import 'forge_type.dart';
 /// [accent] is the app's optional second colour; it lands in
 /// `ForgeTokens.accent` unless [tokens] is given. [extensions] carries any
 /// `ThemeExtension`s of the app's own.
+///
+/// [density] picks the control sizes: [ForgeDensity.touch] (the default)
+/// for phones, [ForgeDensity.desktop] for mouse-driven apps, where buttons
+/// size to their label instead of stretching to their parent's width.
 ThemeData forgeTheme({
   required Color seed,
   Color? accent,
@@ -32,7 +109,9 @@ ThemeData forgeTheme({
   ColorScheme? colorScheme,
   ForgeTokens? tokens,
   Iterable<ThemeExtension<dynamic>> extensions = const [],
+  ForgeDensity density = ForgeDensity.touch,
 }) {
+  final m = _Metrics.of(density);
   final c = colorScheme ?? forgeColorScheme(seed: seed, brightness: brightness);
   final x = tokens ?? ForgeTokens.standard(c, accent: accent);
   final text = ForgeType.textTheme(c, x);
@@ -49,6 +128,7 @@ ThemeData forgeTheme({
     textTheme: text,
     extensions: [x, ...extensions],
     splashFactory: InkSparkle.splashFactory,
+    visualDensity: m.visualDensity,
     // Heroicons, outline, wherever Material would draw its own icon.
     actionIconTheme: ActionIconThemeData(
       backButtonIconBuilder: (_) => const HeroIcon(HeroIcons.arrowLeft),
@@ -83,18 +163,24 @@ ThemeData forgeTheme({
           borderRadius: BorderRadius.circular(ForgeRadii.pill),
         ),
       ),
-      constraints: const BoxConstraints(minHeight: 52),
+      constraints: BoxConstraints(minHeight: m.searchMinHeight),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
-        minimumSize: const Size.fromHeight(50),
+        minimumSize: m.filledMinimumSize,
+        padding: m.buttonPadding,
+        tapTargetSize: m.buttonTapTargetSize,
+        visualDensity: m.buttonVisualDensity,
         shape: RoundedRectangleBorder(borderRadius: cardRadius),
         textStyle: text.labelLarge,
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        minimumSize: const Size.fromHeight(48),
+        minimumSize: m.outlinedMinimumSize,
+        padding: m.buttonPadding,
+        tapTargetSize: m.buttonTapTargetSize,
+        visualDensity: m.buttonVisualDensity,
         side: BorderSide(color: c.outline),
         foregroundColor: c.onSurfaceVariant,
         shape: RoundedRectangleBorder(borderRadius: cardRadius),
@@ -104,6 +190,10 @@ ThemeData forgeTheme({
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: x.link,
+        minimumSize: m.textMinimumSize,
+        padding: m.buttonPadding,
+        tapTargetSize: m.buttonTapTargetSize,
+        visualDensity: m.buttonVisualDensity,
         textStyle: text.labelLarge?.copyWith(fontSize: 13),
       ),
     ),
@@ -162,7 +252,7 @@ ThemeData forgeTheme({
     inputDecorationTheme: InputDecorationThemeData(
       filled: true,
       fillColor: c.surfaceContainerLowest,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      contentPadding: m.inputPadding,
       border: OutlineInputBorder(
         borderRadius: cardRadius,
         borderSide: BorderSide(color: c.outline),
@@ -205,6 +295,7 @@ ThemeData forgeTheme({
     ),
     listTileTheme: ListTileThemeData(
       iconColor: x.textTertiary,
+      visualDensity: m.visualDensity,
       titleTextStyle: text.titleSmall,
       subtitleTextStyle: text.bodySmall,
     ),

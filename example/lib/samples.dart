@@ -29,7 +29,10 @@ class ShowcaseSample {
 
   bool get designed => lightScheme != null;
 
-  ThemeData theme(Brightness brightness) {
+  ThemeData theme(
+    Brightness brightness, {
+    ForgeDensity density = ForgeDensity.touch,
+  }) {
     final dark = brightness == Brightness.dark;
     return forgeTheme(
       seed: seed,
@@ -37,6 +40,7 @@ class ShowcaseSample {
       brightness: brightness,
       colorScheme: dark ? darkScheme : lightScheme,
       tokens: dark ? darkTokens : lightTokens,
+      density: density,
     );
   }
 }
