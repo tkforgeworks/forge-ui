@@ -63,6 +63,44 @@ void main() {
       expect(opened, ['feedback', 'site', 'privacy', 'delete', 'licenses']);
     });
 
+    testWidgets('takes a floating action button and clears it', (tester) async {
+      _tallView(tester);
+      double bottomPadding() => tester
+          .widget<ListView>(find.byType(ListView))
+          .padding!
+          .resolve(TextDirection.ltr)
+          .bottom;
+
+      await tester.pumpWidget(
+        _app(ForgeAboutScreen(appName: 'Sample', onOpenPrivacyPolicy: () {})),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(FloatingActionButton), findsNothing);
+      expect(bottomPadding(), 40);
+
+      await tester.pumpWidget(
+        _app(
+          ForgeAboutScreen(
+            appName: 'Sample',
+            onOpenPrivacyPolicy: () {},
+            floatingActionButton: FloatingActionButton.small(
+              key: const Key('fab'),
+              onPressed: () {},
+              child: const Icon(Icons.chat_bubble_outline),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('fab')), findsOneWidget);
+      expect(bottomPadding(), ForgeAboutScreen.fabBottomPadding);
+      // Material's end-float slot: 16 from the right and bottom edges.
+      final fab = tester.getRect(find.byKey(const Key('fab')));
+      final screen = tester.getRect(find.byType(Scaffold));
+      expect(screen.right - fab.right, 16);
+      expect(screen.bottom - fab.bottom, 16);
+    });
+
     testWidgets('a null callback leaves that link out', (tester) async {
       _tallView(tester);
       await tester.pumpWidget(

@@ -31,6 +31,7 @@ class ForgeAboutScreen extends StatelessWidget {
     this.onOpenLicenses,
     this.footnote,
     this.tintMark = false,
+    this.floatingActionButton,
   });
 
   static const feedbackKey = Key('forge-about-feedback');
@@ -83,6 +84,19 @@ class ForgeAboutScreen extends StatelessWidget {
   /// its brand gradients, for an app whose palette they would clash with.
   final bool tintMark;
 
+  /// A button for the Scaffold's end-float slot, such as an app's feedback
+  /// button (cheesy-scribe CHEESE-72, FU-8). When set, the list ends with
+  /// enough room for a regular 56 dp FAB and its margin, so the footnote or
+  /// the last link never sits under it. Null leaves the layout as it was.
+  final Widget? floatingActionButton;
+
+  /// Bottom padding of the list: the usual 40, or room for the button.
+  static double bottomPaddingFor({required bool hasFab}) =>
+      hasFab ? fabBottomPadding : 40;
+
+  /// 16 margin + 56 button + 16 breathing room.
+  static const fabBottomPadding = 88.0;
+
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
@@ -104,12 +118,13 @@ class ForgeAboutScreen extends StatelessWidget {
     );
     return Scaffold(
       appBar: AppBar(leading: leading, title: Text(title ?? 'About $appName')),
+      floatingActionButton: floatingActionButton,
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(
+        padding: EdgeInsets.fromLTRB(
           28,
           24,
           28,
-          40,
+          bottomPaddingFor(hasFab: floatingActionButton != null),
         ).withNavBarInset(context),
         children: [
           if (badge != null) ...[
