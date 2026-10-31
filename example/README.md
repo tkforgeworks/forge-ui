@@ -21,7 +21,7 @@ MaterialApp(
 **On this page:** [Palette and tokens](#palette-and-tokens) ·
 [Type](#type) · [Buttons](#buttons) · [Fields](#fields) ·
 [Selection controls](#selection-controls) · [Gradient FAB](#gradient-fab) ·
-[Capsules](#capsules) · [Settings group](#settings-group) ·
+[Capsules](#capsules) · [Settings group](#settings-group) · [Scrolling](#scrolling) ·
 [Empty, error and loading states](#empty-error-and-loading-states) ·
 [Confirm sheet](#confirm-sheet) · [Brand marks](#brand-marks) ·
 [About and licences screens](#about-and-licences-screens) ·
@@ -373,6 +373,15 @@ ForgeSettingsGroup(
 <p>
   <img src="test/goldens/components/settings_group_light.png" width="400" alt="Settings group, light">
   <img src="test/goldens/components/settings_group_dark.png" width="400" alt="Settings group, dark">
+</p>
+
+## Scrolling
+
+`forgeTheme` themes the scrollbar thumb from the palette (`textGhost`, `textTertiary` on hover or drag). Under `ForgeDensity.desktop` the thumb stays showing; on touch it fades out as Material does.
+
+<p>
+  <img src="test/goldens/components/scrolling_desktop_light.png" width="400" alt="Scrolling list with scrollbar, desktop density, light">
+  <img src="test/goldens/components/scrolling_desktop_dark.png" width="400" alt="Scrolling list with scrollbar, desktop density, dark">
 </p>
 
 ## Empty, error and loading states

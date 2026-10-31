@@ -155,6 +155,25 @@ ThemeData forgeTheme({
       ),
       margin: EdgeInsets.zero,
     ),
+    // A thumb in the palette: the platform default ignores it and is often
+    // invisible on dark surfaces. Desktop keeps the bar showing; touch keeps
+    // Material's fade-out.
+    scrollbarTheme: ScrollbarThemeData(
+      thumbColor: WidgetStateProperty.resolveWith(
+        (states) =>
+            states.contains(WidgetState.hovered) ||
+                states.contains(WidgetState.dragged)
+            ? x.textTertiary
+            : x.textGhost,
+      ),
+      thickness: const WidgetStatePropertyAll(8),
+      radius: const Radius.circular(ForgeRadii.tag),
+      crossAxisMargin: 2,
+      mainAxisMargin: 4,
+      thumbVisibility: density == ForgeDensity.desktop
+          ? const WidgetStatePropertyAll(true)
+          : null,
+    ),
     searchBarTheme: SearchBarThemeData(
       backgroundColor: WidgetStatePropertyAll(c.surfaceContainer),
       elevation: const WidgetStatePropertyAll(0),

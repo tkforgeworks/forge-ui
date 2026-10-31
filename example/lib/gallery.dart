@@ -542,6 +542,19 @@ class _GalleryScreenState extends State<GalleryScreen> {
             ),
           ),
           _Section(
+            'Scrolling',
+            child: SizedBox(
+              height: 160,
+              child: Card(
+                child: ListView.builder(
+                  itemCount: 20,
+                  itemBuilder: (_, i) =>
+                      ListTile(dense: true, title: Text('Row ${i + 1}')),
+                ),
+              ),
+            ),
+          ),
+          _Section(
             'Empty state',
             child: Card(
               child: ForgeEmptyState(
@@ -698,6 +711,7 @@ const gallerySections = [
   'Main action',
   'Capsules',
   'Settings group',
+  'Scrolling',
   'Empty state',
   'Error',
   'Loading',
