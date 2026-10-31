@@ -275,6 +275,16 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 const ForgeMonoLabel('Mono label'),
                 const SizedBox(height: 4),
                 const ForgeMonoLabel('Mono label, emphasis', emphasis: true),
+                const SizedBox(height: 8),
+                Text(
+                  'max_hp = base + (level - 1) * growth',
+                  style: ForgeType.code(color: c.onSurface),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'max_hp = base + (level - 1) * growth',
+                  style: ForgeType.code(color: x.textTertiary),
+                ),
               ],
             ),
           ),

@@ -9,6 +9,10 @@ import 'forge_tokens.dart';
 /// Poppins is the UI voice, Source Serif 4 the editorial voice (names, prose,
 /// taglines; often italic) and JetBrains Mono the labels and tag capsules
 /// (always uppercase, letterspaced).
+///
+/// JetBrains Mono has two styles. [mono] is for labels and capsules:
+/// uppercase, letterspaced. [code] is for identifiers, export keys, formulas,
+/// file paths and log lines: body-sized, as typed, no tracking.
 abstract final class ForgeType {
   /// The package the font families are declared in. Flutter registers a
   /// dependency's fonts as `packages/<package>/<family>`.
@@ -65,6 +69,24 @@ abstract final class ForgeType {
     fontWeight: weight,
     letterSpacing: letterSpacing,
     color: color,
+  );
+
+  /// JetBrains Mono as body text for code: identifiers, export keys, formulas,
+  /// file paths and log lines. Unlike [mono] it has no letterspacing and the
+  /// content is shown as typed, not uppercased.
+  static TextStyle code({
+    double size = 13,
+    FontWeight weight = FontWeight.w400,
+    Color? color,
+    double? height,
+  }) => TextStyle(
+    fontFamily: monoFamily,
+    package: package,
+    fontSize: size,
+    fontWeight: weight,
+    letterSpacing: 0,
+    color: color,
+    height: height,
   );
 
   /// The type scale, coloured from [scheme] and [tokens].

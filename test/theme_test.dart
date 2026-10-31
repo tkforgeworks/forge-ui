@@ -171,6 +171,23 @@ void main() {
       expect(ForgeType.mono().fontWeight, FontWeight.w500);
       expect(ForgeType.ui(size: 30).fontSize, 30);
     });
+
+    test('code is body-sized mono with no tracking', () {
+      final code = ForgeType.code();
+      expect(code.fontFamily, 'packages/forge_ui/JetBrains Mono');
+      expect(code.fontSize, 13);
+      expect(code.fontWeight, FontWeight.w400);
+      expect(code.letterSpacing, 0);
+      expect(ForgeType.mono().letterSpacing, 1.4);
+      final custom = ForgeType.code(
+        size: 15,
+        weight: FontWeight.w600,
+        height: 1.5,
+      );
+      expect(custom.fontSize, 15);
+      expect(custom.fontWeight, FontWeight.w600);
+      expect(custom.height, 1.5);
+    });
   });
 
   group('ForgeTokens', () {
