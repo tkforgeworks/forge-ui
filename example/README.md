@@ -458,6 +458,7 @@ ForgeAboutScreen(
   onOpenLicenses: () => Navigator.of(context).push(
     MaterialPageRoute<void>(builder: (_) => licenses),
   ),
+  floatingActionButton: feedbackButton, // optional; the list clears it
 );
 
 ForgeLicensesScreen(
