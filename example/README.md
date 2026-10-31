@@ -50,7 +50,8 @@ Divider(color: x.rowDivider);
 
 Three bundled families: Poppins for UI, Source Serif 4 for prose and asides,
 JetBrains Mono for labels. The type scale is in the theme; `ForgeType` builds
-one-off styles in each voice.
+one-off styles in each voice. `ForgeType.code` is JetBrains Mono as body text,
+for identifiers, export keys, formulas, file paths and log lines.
 
 ```dart
 Text('Title large, 22', style: context.text.titleLarge);
@@ -63,6 +64,11 @@ Text(
 
 const ForgeMonoLabel('Mono label'); // uppercases its text
 const ForgeMonoLabel('Mono label, emphasis', emphasis: true);
+
+Text(
+  'max_hp = base + (level - 1) * growth',
+  style: ForgeType.code(color: context.colors.onSurface),
+);
 ```
 
 <p>
