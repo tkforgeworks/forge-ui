@@ -56,6 +56,39 @@ void main() {
     );
   });
 
+  testWidgets('status capsule tones pick their container pairs', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      wrap(
+        const Column(
+          children: [
+            ForgeStatusCapsule('low mana', tone: ForgeStatusTone.warning),
+            ForgeStatusCapsule('tip', tone: ForgeStatusTone.info),
+            ForgeStatusCapsule('ok', tone: ForgeStatusTone.success),
+            ForgeStatusCapsule('legacy', active: true),
+          ],
+        ),
+      ),
+    );
+    final x = tester.element(find.text('LOW MANA')).forge;
+    Color? fill(String text) {
+      final box = tester.widget<Container>(
+        find.ancestor(of: find.text(text), matching: find.byType(Container)),
+      );
+      return (box.decoration! as BoxDecoration).color;
+    }
+
+    expect(fill('LOW MANA'), x.warningContainer);
+    expect(fill('TIP'), x.infoContainer);
+    expect(fill('OK'), x.successContainer);
+    expect(fill('LEGACY'), x.successContainer);
+    expect(
+      tester.widget<Text>(find.text('LOW MANA')).style!.color,
+      x.onWarningContainer,
+    );
+  });
+
   testWidgets('ForgeMonoLabel emphasis uses onPrimaryContainer at 600', (
     tester,
   ) async {

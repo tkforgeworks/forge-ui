@@ -466,15 +466,33 @@ class _GalleryScreenState extends State<GalleryScreen> {
           ),
           const _Section(
             'Capsules',
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              crossAxisAlignment: WrapCrossAlignment.center,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ForgeTagCapsule('Neutral'),
-                ForgeTagCapsule('Emphasis', tone: ForgeCapsuleTone.emphasis),
-                ForgeStatusCapsule('Connected', active: true),
-                ForgeStatusCapsule('Not connected'),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    ForgeTagCapsule('Neutral'),
+                    ForgeTagCapsule(
+                      'Emphasis',
+                      tone: ForgeCapsuleTone.emphasis,
+                    ),
+                    ForgeStatusCapsule(
+                      'Connected',
+                      tone: ForgeStatusTone.success,
+                    ),
+                    ForgeStatusCapsule(
+                      'Low mana',
+                      tone: ForgeStatusTone.warning,
+                    ),
+                    ForgeStatusCapsule('Tip', tone: ForgeStatusTone.info),
+                    ForgeStatusCapsule('Not connected'),
+                  ],
+                ),
+                SizedBox(height: 12),
+                _StatusBanners(),
               ],
             ),
           ),
@@ -756,4 +774,32 @@ class _SampleBadge extends StatelessWidget {
       ),
     ),
   );
+}
+
+/// Tinted banners built from the status container roles.
+class _StatusBanners extends StatelessWidget {
+  const _StatusBanners();
+
+  @override
+  Widget build(BuildContext context) {
+    final x = context.forge;
+    Widget banner(String text, Color fill, Color on) => Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: fill,
+          borderRadius: BorderRadius.circular(ForgeRadii.card),
+        ),
+        child: Text(text, style: context.text.bodySmall!.copyWith(color: on)),
+      ),
+    );
+    return Row(
+      spacing: 8,
+      children: [
+        banner('2 warnings', x.warningContainer, x.onWarningContainer),
+        banner('Tip: press ?', x.infoContainer, x.onInfoContainer),
+        banner('Saved', x.successContainer, x.onSuccessContainer),
+      ],
+    );
+  }
 }
