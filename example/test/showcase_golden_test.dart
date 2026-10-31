@@ -104,6 +104,32 @@ void main() {
     }
   }
 
+  // The buttons under desktop density, for the README: sized to their
+  // labels at 36 high instead of stretched to thumb height.
+  for (final mode in [ThemeMode.light, ThemeMode.dark]) {
+    goldenTest('buttons, desktop density: ${mode.name}', (tester) async {
+      useSurface(tester, gallerySize);
+      await tester.pumpWidget(
+        ShowcaseApp(
+          initialSample: 0,
+          initialMode: mode,
+          initialDensity: ForgeDensity.desktop,
+        ),
+      );
+      await settle(tester);
+      final boundary = tester.renderObject<RenderRepaintBoundary>(
+        find.byKey(gallerySectionKey('Buttons')),
+      );
+      await expectLater(
+        boundary.toImage(pixelRatio: 2),
+        matchesGoldenFile(
+          'goldens/components/buttons_desktop_${mode.name}.png',
+        ),
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+  }
+
   for (final sample in [samples.first, creamAndAmber]) {
     for (final brightness in Brightness.values) {
       Future<void> shoot(

@@ -14,6 +14,8 @@ class GalleryScreen extends StatefulWidget {
     required this.onSampleChanged,
     required this.dark,
     required this.onToggleBrightness,
+    this.density = ForgeDensity.touch,
+    this.onToggleDensity,
   });
 
   final ShowcaseSample sample;
@@ -21,6 +23,8 @@ class GalleryScreen extends StatefulWidget {
   final ValueChanged<int> onSampleChanged;
   final bool dark;
   final VoidCallback onToggleBrightness;
+  final ForgeDensity density;
+  final VoidCallback? onToggleDensity;
 
   @override
   State<GalleryScreen> createState() => _GalleryScreenState();
@@ -128,6 +132,18 @@ class _GalleryScreenState extends State<GalleryScreen> {
       appBar: AppBar(
         title: const Text('forge_ui showcase'),
         actions: [
+          if (widget.onToggleDensity != null)
+            IconButton(
+              tooltip: widget.density == ForgeDensity.desktop
+                  ? 'Touch density'
+                  : 'Desktop density',
+              onPressed: widget.onToggleDensity,
+              icon: HeroIcon(
+                widget.density == ForgeDensity.desktop
+                    ? HeroIcons.devicePhoneMobile
+                    : HeroIcons.computerDesktop,
+              ),
+            ),
           IconButton(
             tooltip: widget.dark ? 'Switch to light' : 'Switch to dark',
             onPressed: widget.onToggleBrightness,

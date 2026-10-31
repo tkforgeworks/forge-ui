@@ -99,12 +99,15 @@ void main() {
     test('buttons are radius 8 at the brand heights', () {
       final filled = t.filledButtonTheme.style!;
       expect(filled.minimumSize!.resolve({})!.height, 50);
+      // Touch buttons stretch to their parent's width.
+      expect(filled.minimumSize!.resolve({})!.width, double.infinity);
       expect(
         (filled.shape!.resolve({})! as RoundedRectangleBorder).borderRadius,
         BorderRadius.circular(8),
       );
       final outlined = t.outlinedButtonTheme.style!;
       expect(outlined.minimumSize!.resolve({})!.height, 48);
+      expect(outlined.minimumSize!.resolve({})!.width, double.infinity);
       expect(outlined.side!.resolve({})!.color, c.outline);
       expect(
         t.textButtonTheme.style!.foregroundColor!.resolve({}),
@@ -147,6 +150,139 @@ void main() {
       expect(icons.closeButtonIconBuilder, isNotNull);
       expect(icons.drawerButtonIconBuilder, isNotNull);
     });
+  });
+
+  group('desktop density', () {
+    final t = forgeTheme(seed: testSeed, density: ForgeDensity.desktop);
+    final touch = forgeTheme(seed: testSeed, density: ForgeDensity.touch);
+    final styles = {
+      'filled': t.filledButtonTheme.style!,
+      'outlined': t.outlinedButtonTheme.style!,
+      'text': t.textButtonTheme.style!,
+    };
+
+    test('buttons are 36 high and only as wide as their label', () {
+      for (final MapEntry(key: name, value: style) in styles.entries) {
+        expect(style.minimumSize!.resolve({}), const Size(0, 36), reason: name);
+        expect(
+          style.padding!.resolve({}),
+          const EdgeInsets.symmetric(horizontal: 16),
+          reason: name,
+        );
+        expect(
+          style.tapTargetSize,
+          MaterialTapTargetSize.shrinkWrap,
+          reason: name,
+        );
+      }
+    });
+
+    test('buttons keep the brand shapes and type', () {
+      final filled = styles['filled']!;
+      expect(
+        (filled.shape!.resolve({})! as RoundedRectangleBorder).borderRadius,
+        BorderRadius.circular(8),
+      );
+      expect(
+        filled.textStyle!.resolve({}),
+        touch.filledButtonTheme.style!.textStyle!.resolve({}),
+      );
+      expect(
+        styles['outlined']!.side!.resolve({})!.color,
+        t.colorScheme.outline,
+      );
+    });
+
+    test('fields, search bars and list tiles tighten', () {
+      expect(
+        t.inputDecorationTheme.contentPadding,
+        const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      );
+      expect(t.searchBarTheme.constraints!.minHeight, 40);
+      expect(t.listTileTheme.visualDensity, VisualDensity.compact);
+      expect(t.visualDensity, VisualDensity.compact);
+    });
+
+    test('segmented buttons and chips are unchanged', () {
+      final seg = t.segmentedButtonTheme.style!;
+      final touchSeg = touch.segmentedButtonTheme.style!;
+      expect(seg.minimumSize!.resolve({}), touchSeg.minimumSize!.resolve({}));
+      expect(seg.padding!.resolve({}), touchSeg.padding!.resolve({}));
+      expect(seg.visualDensity, touchSeg.visualDensity);
+      expect(seg.tapTargetSize, touchSeg.tapTargetSize);
+      expect(t.chipTheme.padding, touch.chipTheme.padding);
+    });
+
+    Widget row(ThemeData theme) => MaterialApp(
+      theme: theme,
+      home: Scaffold(
+        body: Row(
+          children: [
+            FilledButton(onPressed: () {}, child: const Text('Save')),
+            OutlinedButton(onPressed: () {}, child: const Text('Cancel')),
+            TextButton(onPressed: () {}, child: const Text('Help')),
+          ],
+        ),
+      ),
+    );
+
+    testWidgets('buttons lay out at their own width in an unbounded Row', (
+      tester,
+    ) async {
+      await tester.pumpWidget(row(t));
+      expect(tester.takeException(), isNull);
+      final screen = tester.view.physicalSize / tester.view.devicePixelRatio;
+      for (final type in [FilledButton, OutlinedButton, TextButton]) {
+        final size = tester.getSize(find.byType(type));
+        expect(size.width, lessThan(screen.width), reason: '$type');
+        expect(size.height, 36, reason: '$type');
+      }
+    });
+
+    testWidgets('the same Row under touch density throws', (tester) async {
+      // The infinite-width assertion cascades into several more, so collect
+      // them all rather than reading one back with takeException.
+      final errors = <FlutterErrorDetails>[];
+      final previous = FlutterError.onError;
+      FlutterError.onError = errors.add;
+      try {
+        await tester.pumpWidget(row(touch));
+      } finally {
+        FlutterError.onError = previous;
+      }
+      expect(
+        errors.map((e) => e.exceptionAsString()),
+        contains(contains('BoxConstraints forces an infinite width')),
+      );
+    });
+  });
+
+  test('density defaults to touch', () {
+    final byDefault = forgeTheme(seed: testSeed);
+    final touch = forgeTheme(seed: testSeed, density: ForgeDensity.touch);
+    for (final (a, b) in [
+      (byDefault.filledButtonTheme.style!, touch.filledButtonTheme.style!),
+      (byDefault.outlinedButtonTheme.style!, touch.outlinedButtonTheme.style!),
+      (byDefault.textButtonTheme.style!, touch.textButtonTheme.style!),
+    ]) {
+      expect(a.minimumSize?.resolve({}), b.minimumSize?.resolve({}));
+      expect(a.padding?.resolve({}), b.padding?.resolve({}));
+      expect(a.tapTargetSize, b.tapTargetSize);
+      expect(a.visualDensity, b.visualDensity);
+    }
+    expect(
+      byDefault.inputDecorationTheme.contentPadding,
+      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    );
+    expect(
+      byDefault.inputDecorationTheme.contentPadding,
+      touch.inputDecorationTheme.contentPadding,
+    );
+    expect(byDefault.searchBarTheme.constraints!.minHeight, 52);
+    expect(byDefault.searchBarTheme, touch.searchBarTheme);
+    expect(byDefault.listTileTheme.visualDensity, isNull);
+    expect(byDefault.visualDensity, touch.visualDensity);
+    expect(byDefault.textButtonTheme.style!.minimumSize, isNull);
   });
 
   group('type scale', () {
