@@ -41,6 +41,10 @@ Text('Row meta', style: TextStyle(color: x.textTertiary));
 Divider(color: x.rowDivider);
 ```
 
+The status roles are `warning`, `info` and `success`, each with an `onX`, and
+`warningContainer`/`infoContainer` (plus `successContainer`) with their
+`onXContainer`.
+
 <p>
   <img src="test/goldens/components/palette_light.png" width="400" alt="Violet palette swatches, light">
   <img src="test/goldens/components/palette_dark.png" width="400" alt="Violet palette swatches, dark">
@@ -294,15 +298,20 @@ Scaffold(
 ## Capsules
 
 `ForgeTagCapsule` labels a thing; `ForgeStatusCapsule` reports a state. Both
-uppercase their text.
+uppercase their text. A status capsule has four tones: neutral, success,
+warning and info; `active: true` is the older spelling of the success tone.
 
 ```dart
 const ForgeTagCapsule('Neutral');
 const ForgeTagCapsule('Emphasis', tone: ForgeCapsuleTone.emphasis);
 
-const ForgeStatusCapsule('Connected', active: true);
+const ForgeStatusCapsule('Connected', tone: ForgeStatusTone.success);
+const ForgeStatusCapsule('Low mana', tone: ForgeStatusTone.warning);
+const ForgeStatusCapsule('Tip', tone: ForgeStatusTone.info);
 const ForgeStatusCapsule('Not connected');
 ```
+
+The row of tinted banners under the capsules reads the same container roles.
 
 <p>
   <img src="test/goldens/components/capsules_light.png" width="400" alt="Tag and status capsules, light">

@@ -207,6 +207,63 @@ void main() {
       expect(a.lerp(null, 0.5), a);
     });
 
+    test('standard derives the status roles per brightness', () {
+      final light = ForgeTokens.standard(forgeColorScheme(seed: testSeed));
+      final dark = ForgeTokens.standard(
+        forgeColorScheme(seed: testSeed, brightness: Brightness.dark),
+      );
+      expect(light.warning, const Color(0xFFED6C02));
+      expect(light.info, const Color(0xFF0288D1));
+      expect(light.success, const Color(0xFF2E7D32));
+      expect(light.onWarning, const Color(0xFFFFFFFF));
+      expect(dark.warning, const Color(0xFFFFA726));
+      expect(dark.info, const Color(0xFF29B6F6));
+      expect(dark.success, const Color(0xFF66BB6A));
+      expect(dark.onInfo, const Color(0xDE000000));
+      expect(dark.onWarningContainer, dark.warning);
+      expect(
+        light.onInfoContainer,
+        Color.lerp(light.info, const Color(0xFF000000), 0.3),
+      );
+      expect(light.warningContainer, isNot(light.infoContainer));
+    });
+
+    test('copyWith replaces each status role', () {
+      const c = Color(0xFF123456);
+      expect(a.copyWith(warning: c).warning, c);
+      expect(a.copyWith(onWarning: c).onWarning, c);
+      expect(a.copyWith(warningContainer: c).warningContainer, c);
+      expect(a.copyWith(onWarningContainer: c).onWarningContainer, c);
+      expect(a.copyWith(info: c).info, c);
+      expect(a.copyWith(onInfo: c).onInfo, c);
+      expect(a.copyWith(infoContainer: c).infoContainer, c);
+      expect(a.copyWith(onInfoContainer: c).onInfoContainer, c);
+      expect(a.copyWith(success: c).success, c);
+      expect(a.copyWith(onSuccess: c).onSuccess, c);
+      expect(a.copyWith(success: c).warning, a.warning);
+    });
+
+    test('lerp covers the status roles', () {
+      final d = ForgeTokens.standard(
+        forgeColorScheme(seed: testSeed, brightness: Brightness.dark),
+      );
+      expect(a.lerp(d, 0).warning, a.warning);
+      expect(a.lerp(d, 1).warning, d.warning);
+      expect(a.lerp(d, 1).infoContainer, d.infoContainer);
+      expect(a.lerp(d, 1).onSuccess, d.onSuccess);
+    });
+
+    test('a literal without the status roles falls back by brightness', () {
+      const old = DesignedPalette.lightTokens;
+      expect(old.warning, const Color(0xFFED6C02));
+      expect(old.onInfo, const Color(0xFFFFFFFF));
+      expect(old.success, const Color(0xFF2E7D32));
+      final dark = old.copyWith(successContainer: const Color(0xFF2B3D28));
+      expect(dark.warning, const Color(0xFFFFA726));
+      expect(dark.onSuccess, const Color(0xDE000000));
+      expect(dark.onInfoContainer, dark.info);
+    });
+
     testWidgets('of() falls back for a theme not built by forgeTheme', (
       tester,
     ) async {
