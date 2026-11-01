@@ -14,6 +14,8 @@ class GalleryScreen extends StatefulWidget {
     required this.onSampleChanged,
     required this.dark,
     required this.onToggleBrightness,
+    this.density = ForgeDensity.touch,
+    this.onToggleDensity,
   });
 
   final ShowcaseSample sample;
@@ -21,6 +23,8 @@ class GalleryScreen extends StatefulWidget {
   final ValueChanged<int> onSampleChanged;
   final bool dark;
   final VoidCallback onToggleBrightness;
+  final ForgeDensity density;
+  final VoidCallback? onToggleDensity;
 
   @override
   State<GalleryScreen> createState() => _GalleryScreenState();
@@ -128,6 +132,18 @@ class _GalleryScreenState extends State<GalleryScreen> {
       appBar: AppBar(
         title: const Text('forge_ui showcase'),
         actions: [
+          if (widget.onToggleDensity != null)
+            IconButton(
+              tooltip: widget.density == ForgeDensity.desktop
+                  ? 'Touch density'
+                  : 'Desktop density',
+              onPressed: widget.onToggleDensity,
+              icon: HeroIcon(
+                widget.density == ForgeDensity.desktop
+                    ? HeroIcons.devicePhoneMobile
+                    : HeroIcons.computerDesktop,
+              ),
+            ),
           IconButton(
             tooltip: widget.dark ? 'Switch to light' : 'Switch to dark',
             onPressed: widget.onToggleBrightness,
@@ -275,6 +291,16 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 const ForgeMonoLabel('Mono label'),
                 const SizedBox(height: 4),
                 const ForgeMonoLabel('Mono label, emphasis', emphasis: true),
+                const SizedBox(height: 8),
+                Text(
+                  'max_hp = base + (level - 1) * growth',
+                  style: ForgeType.code(color: c.onSurface),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'max_hp = base + (level - 1) * growth',
+                  style: ForgeType.code(color: x.textTertiary),
+                ),
               ],
             ),
           ),
@@ -456,15 +482,33 @@ class _GalleryScreenState extends State<GalleryScreen> {
           ),
           const _Section(
             'Capsules',
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              crossAxisAlignment: WrapCrossAlignment.center,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ForgeTagCapsule('Neutral'),
-                ForgeTagCapsule('Emphasis', tone: ForgeCapsuleTone.emphasis),
-                ForgeStatusCapsule('Connected', active: true),
-                ForgeStatusCapsule('Not connected'),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    ForgeTagCapsule('Neutral'),
+                    ForgeTagCapsule(
+                      'Emphasis',
+                      tone: ForgeCapsuleTone.emphasis,
+                    ),
+                    ForgeStatusCapsule(
+                      'Connected',
+                      tone: ForgeStatusTone.success,
+                    ),
+                    ForgeStatusCapsule(
+                      'Low mana',
+                      tone: ForgeStatusTone.warning,
+                    ),
+                    ForgeStatusCapsule('Tip', tone: ForgeStatusTone.info),
+                    ForgeStatusCapsule('Not connected'),
+                  ],
+                ),
+                SizedBox(height: 12),
+                _StatusBanners(),
               ],
             ),
           ),
@@ -495,6 +539,19 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   onTap: () => _open(_about()),
                 ),
               ],
+            ),
+          ),
+          _Section(
+            'Scrolling',
+            child: SizedBox(
+              height: 160,
+              child: Card(
+                child: ListView.builder(
+                  itemCount: 20,
+                  itemBuilder: (_, i) =>
+                      ListTile(dense: true, title: Text('Row ${i + 1}')),
+                ),
+              ),
             ),
           ),
           _Section(
@@ -654,6 +711,7 @@ const gallerySections = [
   'Main action',
   'Capsules',
   'Settings group',
+  'Scrolling',
   'Empty state',
   'Error',
   'Loading',
@@ -746,4 +804,32 @@ class _SampleBadge extends StatelessWidget {
       ),
     ),
   );
+}
+
+/// Tinted banners built from the status container roles.
+class _StatusBanners extends StatelessWidget {
+  const _StatusBanners();
+
+  @override
+  Widget build(BuildContext context) {
+    final x = context.forge;
+    Widget banner(String text, Color fill, Color on) => Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: fill,
+          borderRadius: BorderRadius.circular(ForgeRadii.card),
+        ),
+        child: Text(text, style: context.text.bodySmall!.copyWith(color: on)),
+      ),
+    );
+    return Row(
+      spacing: 8,
+      children: [
+        banner('2 warnings', x.warningContainer, x.onWarningContainer),
+        banner('Tip: press ?', x.infoContainer, x.onInfoContainer),
+        banner('Saved', x.successContainer, x.onSuccessContainer),
+      ],
+    );
+  }
 }

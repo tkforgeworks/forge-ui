@@ -99,12 +99,15 @@ void main() {
     test('buttons are radius 8 at the brand heights', () {
       final filled = t.filledButtonTheme.style!;
       expect(filled.minimumSize!.resolve({})!.height, 50);
+      // Touch buttons stretch to their parent's width.
+      expect(filled.minimumSize!.resolve({})!.width, double.infinity);
       expect(
         (filled.shape!.resolve({})! as RoundedRectangleBorder).borderRadius,
         BorderRadius.circular(8),
       );
       final outlined = t.outlinedButtonTheme.style!;
       expect(outlined.minimumSize!.resolve({})!.height, 48);
+      expect(outlined.minimumSize!.resolve({})!.width, double.infinity);
       expect(outlined.side!.resolve({})!.color, c.outline);
       expect(
         t.textButtonTheme.style!.foregroundColor!.resolve({}),
@@ -149,6 +152,139 @@ void main() {
     });
   });
 
+  group('desktop density', () {
+    final t = forgeTheme(seed: testSeed, density: ForgeDensity.desktop);
+    final touch = forgeTheme(seed: testSeed, density: ForgeDensity.touch);
+    final styles = {
+      'filled': t.filledButtonTheme.style!,
+      'outlined': t.outlinedButtonTheme.style!,
+      'text': t.textButtonTheme.style!,
+    };
+
+    test('buttons are 36 high and only as wide as their label', () {
+      for (final MapEntry(key: name, value: style) in styles.entries) {
+        expect(style.minimumSize!.resolve({}), const Size(0, 36), reason: name);
+        expect(
+          style.padding!.resolve({}),
+          const EdgeInsets.symmetric(horizontal: 16),
+          reason: name,
+        );
+        expect(
+          style.tapTargetSize,
+          MaterialTapTargetSize.shrinkWrap,
+          reason: name,
+        );
+      }
+    });
+
+    test('buttons keep the brand shapes and type', () {
+      final filled = styles['filled']!;
+      expect(
+        (filled.shape!.resolve({})! as RoundedRectangleBorder).borderRadius,
+        BorderRadius.circular(8),
+      );
+      expect(
+        filled.textStyle!.resolve({}),
+        touch.filledButtonTheme.style!.textStyle!.resolve({}),
+      );
+      expect(
+        styles['outlined']!.side!.resolve({})!.color,
+        t.colorScheme.outline,
+      );
+    });
+
+    test('fields, search bars and list tiles tighten', () {
+      expect(
+        t.inputDecorationTheme.contentPadding,
+        const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      );
+      expect(t.searchBarTheme.constraints!.minHeight, 40);
+      expect(t.listTileTheme.visualDensity, VisualDensity.compact);
+      expect(t.visualDensity, VisualDensity.compact);
+    });
+
+    test('segmented buttons and chips are unchanged', () {
+      final seg = t.segmentedButtonTheme.style!;
+      final touchSeg = touch.segmentedButtonTheme.style!;
+      expect(seg.minimumSize!.resolve({}), touchSeg.minimumSize!.resolve({}));
+      expect(seg.padding!.resolve({}), touchSeg.padding!.resolve({}));
+      expect(seg.visualDensity, touchSeg.visualDensity);
+      expect(seg.tapTargetSize, touchSeg.tapTargetSize);
+      expect(t.chipTheme.padding, touch.chipTheme.padding);
+    });
+
+    Widget row(ThemeData theme) => MaterialApp(
+      theme: theme,
+      home: Scaffold(
+        body: Row(
+          children: [
+            FilledButton(onPressed: () {}, child: const Text('Save')),
+            OutlinedButton(onPressed: () {}, child: const Text('Cancel')),
+            TextButton(onPressed: () {}, child: const Text('Help')),
+          ],
+        ),
+      ),
+    );
+
+    testWidgets('buttons lay out at their own width in an unbounded Row', (
+      tester,
+    ) async {
+      await tester.pumpWidget(row(t));
+      expect(tester.takeException(), isNull);
+      final screen = tester.view.physicalSize / tester.view.devicePixelRatio;
+      for (final type in [FilledButton, OutlinedButton, TextButton]) {
+        final size = tester.getSize(find.byType(type));
+        expect(size.width, lessThan(screen.width), reason: '$type');
+        expect(size.height, 36, reason: '$type');
+      }
+    });
+
+    testWidgets('the same Row under touch density throws', (tester) async {
+      // The infinite-width assertion cascades into several more, so collect
+      // them all rather than reading one back with takeException.
+      final errors = <FlutterErrorDetails>[];
+      final previous = FlutterError.onError;
+      FlutterError.onError = errors.add;
+      try {
+        await tester.pumpWidget(row(touch));
+      } finally {
+        FlutterError.onError = previous;
+      }
+      expect(
+        errors.map((e) => e.exceptionAsString()),
+        contains(contains('BoxConstraints forces an infinite width')),
+      );
+    });
+  });
+
+  test('density defaults to touch', () {
+    final byDefault = forgeTheme(seed: testSeed);
+    final touch = forgeTheme(seed: testSeed, density: ForgeDensity.touch);
+    for (final (a, b) in [
+      (byDefault.filledButtonTheme.style!, touch.filledButtonTheme.style!),
+      (byDefault.outlinedButtonTheme.style!, touch.outlinedButtonTheme.style!),
+      (byDefault.textButtonTheme.style!, touch.textButtonTheme.style!),
+    ]) {
+      expect(a.minimumSize?.resolve({}), b.minimumSize?.resolve({}));
+      expect(a.padding?.resolve({}), b.padding?.resolve({}));
+      expect(a.tapTargetSize, b.tapTargetSize);
+      expect(a.visualDensity, b.visualDensity);
+    }
+    expect(
+      byDefault.inputDecorationTheme.contentPadding,
+      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    );
+    expect(
+      byDefault.inputDecorationTheme.contentPadding,
+      touch.inputDecorationTheme.contentPadding,
+    );
+    expect(byDefault.searchBarTheme.constraints!.minHeight, 52);
+    expect(byDefault.searchBarTheme, touch.searchBarTheme);
+    expect(byDefault.listTileTheme.visualDensity, isNull);
+    expect(byDefault.visualDensity, touch.visualDensity);
+    expect(byDefault.textButtonTheme.style!.minimumSize, isNull);
+  });
+
   group('type scale', () {
     final t = forgeTheme(seed: testSeed).textTheme;
 
@@ -171,6 +307,23 @@ void main() {
       expect(ForgeType.mono().fontWeight, FontWeight.w500);
       expect(ForgeType.ui(size: 30).fontSize, 30);
     });
+
+    test('code is body-sized mono with no tracking', () {
+      final code = ForgeType.code();
+      expect(code.fontFamily, 'packages/forge_ui/JetBrains Mono');
+      expect(code.fontSize, 13);
+      expect(code.fontWeight, FontWeight.w400);
+      expect(code.letterSpacing, 0);
+      expect(ForgeType.mono().letterSpacing, 1.4);
+      final custom = ForgeType.code(
+        size: 15,
+        weight: FontWeight.w600,
+        height: 1.5,
+      );
+      expect(custom.fontSize, 15);
+      expect(custom.fontWeight, FontWeight.w600);
+      expect(custom.height, 1.5);
+    });
   });
 
   group('ForgeTokens', () {
@@ -188,6 +341,63 @@ void main() {
       expect(a.lerp(b, 1).textGhost, b.textGhost);
       expect(a.lerp(b, 1).errorTint, b.errorTint);
       expect(a.lerp(null, 0.5), a);
+    });
+
+    test('standard derives the status roles per brightness', () {
+      final light = ForgeTokens.standard(forgeColorScheme(seed: testSeed));
+      final dark = ForgeTokens.standard(
+        forgeColorScheme(seed: testSeed, brightness: Brightness.dark),
+      );
+      expect(light.warning, const Color(0xFFED6C02));
+      expect(light.info, const Color(0xFF0288D1));
+      expect(light.success, const Color(0xFF2E7D32));
+      expect(light.onWarning, const Color(0xFFFFFFFF));
+      expect(dark.warning, const Color(0xFFFFA726));
+      expect(dark.info, const Color(0xFF29B6F6));
+      expect(dark.success, const Color(0xFF66BB6A));
+      expect(dark.onInfo, const Color(0xDE000000));
+      expect(dark.onWarningContainer, dark.warning);
+      expect(
+        light.onInfoContainer,
+        Color.lerp(light.info, const Color(0xFF000000), 0.3),
+      );
+      expect(light.warningContainer, isNot(light.infoContainer));
+    });
+
+    test('copyWith replaces each status role', () {
+      const c = Color(0xFF123456);
+      expect(a.copyWith(warning: c).warning, c);
+      expect(a.copyWith(onWarning: c).onWarning, c);
+      expect(a.copyWith(warningContainer: c).warningContainer, c);
+      expect(a.copyWith(onWarningContainer: c).onWarningContainer, c);
+      expect(a.copyWith(info: c).info, c);
+      expect(a.copyWith(onInfo: c).onInfo, c);
+      expect(a.copyWith(infoContainer: c).infoContainer, c);
+      expect(a.copyWith(onInfoContainer: c).onInfoContainer, c);
+      expect(a.copyWith(success: c).success, c);
+      expect(a.copyWith(onSuccess: c).onSuccess, c);
+      expect(a.copyWith(success: c).warning, a.warning);
+    });
+
+    test('lerp covers the status roles', () {
+      final d = ForgeTokens.standard(
+        forgeColorScheme(seed: testSeed, brightness: Brightness.dark),
+      );
+      expect(a.lerp(d, 0).warning, a.warning);
+      expect(a.lerp(d, 1).warning, d.warning);
+      expect(a.lerp(d, 1).infoContainer, d.infoContainer);
+      expect(a.lerp(d, 1).onSuccess, d.onSuccess);
+    });
+
+    test('a literal without the status roles falls back by brightness', () {
+      const old = DesignedPalette.lightTokens;
+      expect(old.warning, const Color(0xFFED6C02));
+      expect(old.onInfo, const Color(0xFFFFFFFF));
+      expect(old.success, const Color(0xFF2E7D32));
+      final dark = old.copyWith(successContainer: const Color(0xFF2B3D28));
+      expect(dark.warning, const Color(0xFFFFA726));
+      expect(dark.onSuccess, const Color(0xDE000000));
+      expect(dark.onInfoContainer, dark.info);
     });
 
     testWidgets('of() falls back for a theme not built by forgeTheme', (
@@ -218,5 +428,50 @@ void main() {
       Color(0xFFF68F25),
       Color(0xFFEE3423),
     ]);
+  });
+
+  group('scrollbar theme', () {
+    for (final density in ForgeDensity.values) {
+      test('${density.name}: palette thumb, 8 thick, tag radius', () {
+        final t = forgeTheme(seed: testSeed, density: density);
+        final x = t.extension<ForgeTokens>()!;
+        final sb = t.scrollbarTheme;
+        expect(sb.thumbColor!.resolve({}), x.textGhost);
+        expect(sb.thumbColor!.resolve({WidgetState.hovered}), x.textTertiary);
+        expect(sb.thumbColor!.resolve({WidgetState.dragged}), x.textTertiary);
+        expect(sb.thickness!.resolve({}), 8);
+        expect(sb.radius, const Radius.circular(ForgeRadii.tag));
+        expect(sb.trackVisibility, isNull);
+      });
+    }
+
+    test('thumb is always visible on desktop only', () {
+      final desktop = forgeTheme(seed: testSeed, density: ForgeDensity.desktop);
+      final touch = forgeTheme(seed: testSeed);
+      expect(desktop.scrollbarTheme.thumbVisibility!.resolve({}), isTrue);
+      expect(touch.scrollbarTheme.thumbVisibility, isNull);
+    });
+
+    testWidgets('a long list gets a scrollbar on desktop platforms', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(400, 300);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: forgeTheme(seed: testSeed, density: ForgeDensity.desktop),
+          home: Scaffold(
+            body: ListView.builder(
+              itemCount: 100,
+              itemBuilder: (_, i) => Text('Row $i'),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      expect(find.byType(Scrollbar), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }, variant: TargetPlatformVariant.desktop());
   });
 }

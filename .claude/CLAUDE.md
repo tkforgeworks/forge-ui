@@ -54,8 +54,9 @@ means updating the gallery section, its golden and that README together.
 
 - Branching (org standard, `tkforgeworks/.github/docs/branching-and-release.md`):
   `main` is the released state; work accumulates on the current release branch
-  `vX.Y.Z/main` (currently **`v0.2.1/main`**, cut from `main` on 2026-10-31
-  for FU-8; `v0.2.0/main` shipped as `v0.2.0` on 2026-10-19, `v0.1.0/main`
+  `vX.Y.Z/main` (currently **`v0.2.2/main`**, cut from `main` on 2026-10-31
+  for the Anvil desktop fixes FU-9..12; `v0.2.1/main` shipped as `v0.2.1`
+  the same day, `v0.2.0/main` as `v0.2.0` on 2026-10-19, `v0.1.0/main`
   as `v0.1.0` on 2026-10-14 and `v0.0.1/main` was the repo-setup batch, all
   merged); topic branches PR **into the release branch**, never
   into `main`; the release branch reaches `main` via a release PR.
@@ -147,6 +148,27 @@ means updating the gallery section, its golden and that README together.
   package's own widget tests have no `packages/forge_ui/` prefix; the
   showcase goldens are where it is really rendered.
 - Icons are Heroicons outline, through the `heroicons` package (MIT).
+- **Density (FU-10, v0.2.2).** `forgeTheme(density:)` takes
+  `ForgeDensity.touch` (the default: the phone metrics the brand started
+  on, full-width 50/48 buttons) or `ForgeDensity.desktop` (Anvil: buttons
+  sized to their label at 36 high, tighter fields, search bar and list
+  tiles, `VisualDensity.compact` theme-wide). The touch path is pixel-
+  identical to before densities existed, and the showcase goldens prove
+  it; a private `_Metrics` record per density holds every value that
+  differs, so never scatter density ternaries through the builder.
+  Desktop also keeps the scrollbar thumb visible (FU-12); both densities
+  draw it in `textGhost` with `ForgeRadii.tag` corners.
+- **Status roles (FU-9, v0.2.2).** `ForgeTokens` carries `warning`,
+  `info` and `success` with their on-colours and tinted containers, from
+  fixed hues per brightness (a seed cannot produce them). They are optional
+  in the `const` constructor behind getters that fall back by the success
+  container's luminance, so pre-FU-9 literals compile unchanged; new
+  literals should pass them. `successContainer`/`onSuccessContainer` is
+  the older capsule green and is not derived from `success`.
+  `ForgeStatusCapsule` takes `tone`; `active: true` still means success.
+- **`ForgeType.code` (FU-11, v0.2.2)** is JetBrains Mono as body text (13,
+  no tracking, as typed) for identifiers, export keys, formulas and paths;
+  `ForgeType.mono` stays the uppercase letterspaced label.
 - Release scope: v0.1 is theme, tokens, base components and the about and
   licences screens (shipped). **v0.2 ships the sign-in panel/screen and the
   account settings page together**, alongside forge-core v0.1, for
@@ -245,10 +267,20 @@ only). cheesy-scribe 0.3.0 adopted rc.1–rc.6 across eleven RCs on Tim's
 device (sign-in panel, check-email and set-password screens, account
 settings, typed confirm sheet, sign-out sheet) and re-pins to `v0.2.0`.
 
+2026-10-31: **v0.2.1 released** (FU-8, the `ForgeAboutScreen` FAB slot).
+`v0.2.2/main` cut the same day for the gaps Anvil found while building its
+theme on v0.2.1 (ANVL-154), all merged in one session: FU-11
+`ForgeType.code` (PR #24, also starts the cycle at 0.2.2+15), FU-9 status
+roles and capsule tones (PR #25), FU-10 `ForgeDensity` (PR #26), FU-12
+scrollbar theme (PR #27). Anvil is the first desktop consumer and adopts
+the 0.2.2 tag under ANVL-170, which blocks its first 0.2.0 RC. The
+showcase has a density toggle beside the brightness one and desktop
+goldens for the Buttons and Scrolling sections.
+
 ## Next actions
 
 `main` is PR-only, so every change, including edits to this file, goes
-through a topic branch and a PR into `v0.2.1/main`.
+through a topic branch and a PR into `v0.2.2/main`.
 
 1. **v0.2.0 released** (2026-10-19; FU-2..6 done, adopted by cheesy-scribe
    0.3.0 and re-pinned to the stable tag).
@@ -260,7 +292,11 @@ through a topic branch and a PR into `v0.2.1/main`.
    FU-7 (Apple sign-in, 0.3.0, for cheesy-scribe 1.0.0) keeps its number.
    The showcase's about entry passes no button on purpose: its golden is
    the "unchanged without one" check; `example/README.md` names the slot.
-3. Keep the callback shapes aligned with forge-core's real API as it lands
+3. **v0.2.2** (`v0.2.2/main`, 2026-10-31): FU-9/10/11/12 merged; cut the
+   RC and finalise so Anvil (ANVL-170) can pin `v0.2.2`. Cheesy Scribe is
+   unaffected until it re-pins (touch density is the default; its
+   `ForgeTokens` literals keep compiling).
+4. Keep the callback shapes aligned with forge-core's real API as it lands
    (the spec's `ForgeAccountSettings` sketch is the contract).
 
 ## Open items

@@ -21,7 +21,7 @@ MaterialApp(
 **On this page:** [Palette and tokens](#palette-and-tokens) ·
 [Type](#type) · [Buttons](#buttons) · [Fields](#fields) ·
 [Selection controls](#selection-controls) · [Gradient FAB](#gradient-fab) ·
-[Capsules](#capsules) · [Settings group](#settings-group) ·
+[Capsules](#capsules) · [Settings group](#settings-group) · [Scrolling](#scrolling) ·
 [Empty, error and loading states](#empty-error-and-loading-states) ·
 [Confirm sheet](#confirm-sheet) · [Brand marks](#brand-marks) ·
 [About and licences screens](#about-and-licences-screens) ·
@@ -41,6 +41,10 @@ Text('Row meta', style: TextStyle(color: x.textTertiary));
 Divider(color: x.rowDivider);
 ```
 
+The status roles are `warning`, `info` and `success`, each with an `onX`, and
+`warningContainer`/`infoContainer` (plus `successContainer`) with their
+`onXContainer`.
+
 <p>
   <img src="test/goldens/components/palette_light.png" width="400" alt="Violet palette swatches, light">
   <img src="test/goldens/components/palette_dark.png" width="400" alt="Violet palette swatches, dark">
@@ -50,7 +54,8 @@ Divider(color: x.rowDivider);
 
 Three bundled families: Poppins for UI, Source Serif 4 for prose and asides,
 JetBrains Mono for labels. The type scale is in the theme; `ForgeType` builds
-one-off styles in each voice.
+one-off styles in each voice. `ForgeType.code` is JetBrains Mono as body text,
+for identifiers, export keys, formulas, file paths and log lines.
 
 ```dart
 Text('Title large, 22', style: context.text.titleLarge);
@@ -63,6 +68,11 @@ Text(
 
 const ForgeMonoLabel('Mono label'); // uppercases its text
 const ForgeMonoLabel('Mono label, emphasis', emphasis: true);
+
+Text(
+  'max_hp = base + (level - 1) * growth',
+  style: ForgeType.code(color: context.colors.onSurface),
+);
 ```
 
 <p>
@@ -92,6 +102,29 @@ TextButton(onPressed: forgot, child: const Text('Forgot password?'));
 <p>
   <img src="test/goldens/components/buttons_light.png" width="400" alt="Buttons, light">
   <img src="test/goldens/components/buttons_dark.png" width="400" alt="Buttons, dark">
+</p>
+
+Those are phone sizes: a filled or outlined button stretches to its parent's
+width, so one inside a bare `Row` throws. A mouse-driven app passes
+`density: ForgeDensity.desktop` to `forgeTheme`, and every filled, outlined
+and text button sizes to its label at 36 high, with tighter fields, search
+bars and list tiles to match. Wrap a button in `Expanded` where it should
+still fill a row.
+
+```dart
+MaterialApp(
+  theme: forgeTheme(seed: seed, density: ForgeDensity.desktop),
+  darkTheme: forgeTheme(
+    seed: seed,
+    brightness: Brightness.dark,
+    density: ForgeDensity.desktop,
+  ),
+);
+```
+
+<p>
+  <img src="test/goldens/components/buttons_desktop_light.png" width="400" alt="Buttons at desktop density, light">
+  <img src="test/goldens/components/buttons_desktop_dark.png" width="400" alt="Buttons at desktop density, dark">
 </p>
 
 ## Sign-in buttons
@@ -288,15 +321,20 @@ Scaffold(
 ## Capsules
 
 `ForgeTagCapsule` labels a thing; `ForgeStatusCapsule` reports a state. Both
-uppercase their text.
+uppercase their text. A status capsule has four tones: neutral, success,
+warning and info; `active: true` is the older spelling of the success tone.
 
 ```dart
 const ForgeTagCapsule('Neutral');
 const ForgeTagCapsule('Emphasis', tone: ForgeCapsuleTone.emphasis);
 
-const ForgeStatusCapsule('Connected', active: true);
+const ForgeStatusCapsule('Connected', tone: ForgeStatusTone.success);
+const ForgeStatusCapsule('Low mana', tone: ForgeStatusTone.warning);
+const ForgeStatusCapsule('Tip', tone: ForgeStatusTone.info);
 const ForgeStatusCapsule('Not connected');
 ```
+
+The row of tinted banners under the capsules reads the same container roles.
 
 <p>
   <img src="test/goldens/components/capsules_light.png" width="400" alt="Tag and status capsules, light">
@@ -335,6 +373,15 @@ ForgeSettingsGroup(
 <p>
   <img src="test/goldens/components/settings_group_light.png" width="400" alt="Settings group, light">
   <img src="test/goldens/components/settings_group_dark.png" width="400" alt="Settings group, dark">
+</p>
+
+## Scrolling
+
+`forgeTheme` themes the scrollbar thumb from the palette (`textGhost`, `textTertiary` on hover or drag). Under `ForgeDensity.desktop` the thumb stays showing; on touch it fades out as Material does.
+
+<p>
+  <img src="test/goldens/components/scrolling_desktop_light.png" width="400" alt="Scrolling list with scrollbar, desktop density, light">
+  <img src="test/goldens/components/scrolling_desktop_dark.png" width="400" alt="Scrolling list with scrollbar, desktop density, dark">
 </p>
 
 ## Empty, error and loading states
@@ -546,7 +593,9 @@ Dark:
 flutter run -d linux      # or an Android device
 ```
 
-Open the drawer to switch palette; the sun/moon button switches brightness.
+Open the drawer to switch palette; the sun/moon button switches brightness,
+and the desktop/phone button next to it switches between touch and desktop
+density.
 
 ## Golden tests
 
